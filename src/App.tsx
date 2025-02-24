@@ -1,35 +1,115 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { produce } from "immer";
+import { useState } from "react";
+import Sidebar from "./sidebar/Sidebar";
+import "./style.css";
+import mockData from "./subjects.json";
+import { ActivityType, SubjectType } from "./types/common";
+import Uploader from "./uploader/Uploader";
+
+import CalendarPage from "./calendar/CalendarPage";
+import { getSubjects } from "./lib/dateHelpers";
+
+const queryClient = new QueryClient();
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [subjects, setSubjects] = useState<SubjectType[]>(
+    getSubjects(mockData),
+  );
+  console.log("subjects", subjects);
+
+  function handleToggleActivity(activity: ActivityType) {
+    setSubjects(
+      produce((draft: SubjectType[]) => {
+        let subjectIdx = draft.findIndex((s) => s.code === activity.code);
+        if (subjectIdx === -1) {
+          return;
+        }
+        const acIdx = draft[subjectIdx].activities.findIndex(
+          (ac) => ac.id === activity.id,
+        );
+        if (acIdx === -1) {
+          return;
+        }
+        // toggle activity
+        draft[subjectIdx].activities[acIdx].selected =
+          !draft[subjectIdx].activities[acIdx].selected;
+
+        // unselect of no activities selected
+        if (draft[subjectIdx].activities.every((ac) => ac.selected === false)) {
+          draft[subjectIdx].selected = false;
+        } else {
+          draft[subjectIdx].selected = true;
+        }
+      }),
+    );
+  }
+
+  function handleDeselectActivity(activity: ActivityType) {
+    setSubjects(
+      produce((draft: SubjectType[]) => {
+        let subjectIdx = draft.findIndex((s) => s.code === activity.code);
+        if (subjectIdx === -1) {
+          return;
+        }
+        const acIdx = draft[subjectIdx].activities.findIndex(
+          (ac) => ac.id === activity.id,
+        );
+        if (acIdx === -1) {
+          return;
+        }
+        // deselect activity
+        draft[subjectIdx].activities[acIdx].selected = false;
+
+        // unselect of no activities selected
+        if (draft[subjectIdx].activities.every((ac) => ac.selected === false)) {
+          draft[subjectIdx].selected = false;
+        } else {
+          draft[subjectIdx].selected = true;
+        }
+      }),
+    );
+  }
+
+  function handleDeselectSubject(subject: SubjectType) {
+    setSubjects(
+      produce((draft: SubjectType[]) => {
+        let subjectIdx = draft.findIndex((s) => s.code === subject.code);
+        if (subjectIdx === -1) {
+          return;
+        }
+        draft[subjectIdx].selected = false;
+        draft[subjectIdx].activities.forEach((activity) => {
+          activity.selected = false;
+        });
+      }),
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <QueryClientProvider client={queryClient}>
+      <div className="flex h-screen overflow-x-auto bg-gray-100">
+        {subjects === undefined ? (
+          <Uploader />
+        ) : (
+          <>
+            <Sidebar
+              subjects={subjects}
+              onToggleActivity={handleToggleActivity}
+              onDeSelectSubject={handleDeselectSubject}
+            />
+            <CalendarPage
+              subjects={subjects}
+              // onChangeActivity={selectingSubject}
+              onDeselectActivity={handleDeselectActivity}
+            />
+          </>
+        )}
       </div>
-      <h1>Vite + React</h1>
-      <div className="p-10 border-4 border-red-300">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
