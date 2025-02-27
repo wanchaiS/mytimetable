@@ -1,7 +1,7 @@
 export interface SubjectType {
   code: string;
   name: string;
-  selected: boolean;
+  fullyEnrolled: boolean;
   activities: ActivityType[];
 }
 
@@ -17,6 +17,7 @@ export interface ActivityType {
   dates: Date[];
   id: string;
   selected: boolean;
+  codeType: string;
 }
 
 export interface ActivityTypeInput {
@@ -31,6 +32,12 @@ export interface ActivityTypeInput {
   weeks: string;
 }
 
+export interface AppContextType {
+  selectMode: boolean;
+  selectingSubject: SubjectType | undefined;
+  swappingActivity: ActivityType | undefined;
+}
+
 export type Day =
   | "Monday"
   | "Tuesday"
@@ -39,3 +46,5 @@ export type Day =
   | "Friday"
   | "Saturday"
   | "Sunday";
+
+export type Preference = "MostTimeEfficient" | "EarlyBird" | "NightOwl";

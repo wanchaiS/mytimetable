@@ -3,19 +3,25 @@ import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { ArrowLeftRight, CalendarX2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { cn } from "../../lib/utils";
 import { ActivityType } from "../../types/common";
+
+import { AppContext } from "@/App";
+import AnimateBoarderContainer from "@/components/animateBorderContainer/AnimateBoarderContainer";
+import { Button } from "@/components/ui/button";
+import "./style.css";
 
 interface ActivityProps {
   activity: ActivityType;
   maxColumns: number;
   colNumber: number;
-  onChangeActivity: (
-    oldActivity: ActivityType,
-    newActivity: ActivityType,
-  ) => void;
+  isOption: boolean;
+  hasRemainingOptions: boolean;
+  onClickSwap: (swappingout: ActivityType) => void;
   onDeselectActivity: (activity: ActivityType) => void;
+  onSwapTo: (swappingin: ActivityType) => void;
+  onSelectActivityFromSelectingSubject: (swappingin: ActivityType) => void;
 }
 
 function getHeight(activity: ActivityType): number {
@@ -72,25 +78,63 @@ export default function Activity({
   activity,
   colNumber,
   maxColumns,
-  onChangeActivity,
+  isOption,
+  hasRemainingOptions,
+  onClickSwap,
   onDeselectActivity,
+  onSwapTo,
+  onSelectActivityFromSelectingSubject,
 }: ActivityProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
+  const { swappingActivity, selectMode } = use(AppContext);
+  const swapMode = swappingActivity !== undefined;
+  const isSwapOrigin = swappingActivity?.id === activity.id;
 
   const height = getHeight(activity);
   const top = getTop(activity);
   const width = getWidth(maxColumns);
   const left = width * colNumber;
 
+  if (isOption && selectMode) {
+    return (
+      <div
+        className="absolute pr-2 pb-1"
+        style={{
+          top: `${top}px`,
+          left: `${left}px`,
+          width: `${width}px`,
+          height: `${height}px`,
+        }}
+      >
+        <AnimateBoarderContainer>
+          <div
+            onClick={() => onSelectActivityFromSelectingSubject(activity)}
+            className={cn(
+              "group bg-background relative flex h-full rounded-sm p-1 hover:brightness-90",
+            )}
+          >
+            <div className="flex w-full flex-col space-y-2">
+              <ActivityBadge type={activity.type} />
+              <Badge variant="outline">{activity.activity}</Badge>
+            </div>
+          </div>
+        </AnimateBoarderContainer>
+      </div>
+    );
+  }
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open && !selectMode} onOpenChange={setOpen}>
       <PopoverTrigger
         asChild
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
       >
         <div
-          className="absolute pr-2 pb-1 hover:brightness-75"
+          className={cn(
+            "absolute pr-2 pb-1 hover:brightness-75",
+            `${selectMode ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
+          )}
           style={{
             top: `${top}px`,
             left: `${left}px`,
@@ -105,17 +149,41 @@ export default function Activity({
             )}
           >
             <div className="flex w-full flex-col space-y-2">
-              <div className="line-clamp-3 text-sm break-words">
+              <div className="truncate-text h-full overflow-hidden text-sm text-ellipsis">
                 {activity.name}
               </div>
               {maxColumns <= 2 && (
-                <>
+                <div
+                  className={`"flex space-x-1 ${activity.duration <= 1 ? "flex-col" : ""}"`}
+                >
                   <ActivityBadge type={activity.type} />
                   <Badge variant="outline">{activity.activity}</Badge>
-                </>
+                </div>
               )}
             </div>
           </div>
+          {selectMode && isSwapOrigin && (
+            <div
+              className="absolute pr-2 pb-1"
+              style={{
+                top: "0px",
+                left: `${left}px`,
+                width: `${width}px`,
+                height: `${height}px`,
+              }}
+            >
+              <div className="animated-border h-full rounded-sm p-0.5">
+                <div className="hover:bg-secondary flex h-full w-full items-center justify-center opacity-0 hover:opacity-70">
+                  <Button
+                    onClick={() => onSwapTo(activity)}
+                    className="h-full w-full cursor-pointer"
+                  >
+                    Select
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </PopoverTrigger>
       <PopoverContent
@@ -131,14 +199,25 @@ export default function Activity({
           </div>
         )}
         <div
-          onClick={() => {}}
-          className="flex cursor-pointer items-center space-x-1 text-sm hover:bg-gray-200"
+          onClick={() =>
+            !selectMode && hasRemainingOptions && onClickSwap(activity)
+          }
+          className={cn(
+            "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
+            {
+              "cursor-not-allowed opacity-50":
+                selectMode || !hasRemainingOptions,
+            },
+          )}
         >
           <ArrowLeftRight color="#4ca03b" size={14} /> <span>Swap</span>
         </div>
         <div
-          onClick={() => onDeselectActivity(activity)}
-          className="flex cursor-pointer items-center space-x-1 text-sm hover:bg-gray-200"
+          onClick={() => !selectMode && onDeselectActivity(activity)}
+          className={cn(
+            "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
+            { "cursor-not-allowed opacity-50": selectMode },
+          )}
         >
           <CalendarX2 color="#a03b3b" size={14} />
           <span>Remove</span>

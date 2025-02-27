@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { AppContext } from "@/App";
+import { use, useEffect, useRef, useState } from "react";
 import { getStartEndWeekDate, isSameDay } from "../lib/dateHelpers";
 import { ActivityType, SubjectType } from "../types/common";
 import { DAY_ABBREVIATIONS } from "./constants";
@@ -32,11 +32,10 @@ function getTimes(): string[] {
 
 interface CalendarPageProp {
   subjects: SubjectType[];
-  onChangeActivity: (
-    oldActivity: ActivityType,
-    newActivity: ActivityType,
-  ) => void;
+  onSwapTo: (swappingin: ActivityType) => void;
+  onClickSwap: (swappingout: ActivityType) => void;
   onDeselectActivity: (activity: ActivityType) => void;
+  onSelectActivityFromSelectingSubject: (activity: ActivityType) => void;
 }
 
 const cellWidth = 175;
@@ -69,22 +68,33 @@ function getDayName(date: Date) {
 
 export default function CalendarPage({
   subjects,
-  onChangeActivity,
+  onSwapTo,
+  onClickSwap,
   onDeselectActivity,
+  onSelectActivityFromSelectingSubject,
 }: CalendarPageProp): React.JSX.Element {
   const startHourRef = useRef<HTMLDivElement | null>(null);
   const [days, setDays] = useState<Date[]>(getDatesOfWeek());
   const [currentWeek, setCurrentWeek] = useState<number>(0);
+  const { swappingActivity, selectingSubject } = use(AppContext);
 
   const selectedActivities = subjects
     .flatMap((sub) => sub.activities)
     .filter((ac) => ac.selected);
 
   const availableActivities = subjects
-    .filter((sub) => sub.selected)
     .flatMap((sub) => sub.activities)
     .filter((ac) => !ac.selected);
 
+  const swapingActivityOptions = subjects
+    .filter((sub) => sub.code === swappingActivity?.code)
+    .flatMap((sub) => sub.activities)
+    .filter((ac) => !ac.selected && swappingActivity?.type === ac.type);
+
+  const selectingSubjectActivityOptions = subjects
+    .filter((sub) => sub.code === selectingSubject?.code)
+    .flatMap((sub) => sub.activities)
+    .filter((ac) => !ac.selected);
   const currentWeekActivities =
     currentWeek === 0
       ? selectedActivities
@@ -92,7 +102,6 @@ export default function CalendarPage({
           sa.dates.some((d) => days.some((day) => isSameDay(day, d))),
         );
 
-  console.log("currentWeekActivities", currentWeekActivities);
   useEffect(() => {
     if (startHourRef.current) {
       startHourRef.current.scrollIntoView({ behavior: "auto", block: "start" });
@@ -118,7 +127,7 @@ export default function CalendarPage({
 
   return (
     <div className="flex-1 flex-col border-r border-gray-200">
-      <div className="flex">
+      {/* <div className="flex">
         <Button className="" onClick={() => handlePreviousWeek()}>
           Back
         </Button>
@@ -130,7 +139,7 @@ export default function CalendarPage({
         </div>
 
         <Button onClick={() => handleNextWeek()}>Next</Button>
-      </div>
+      </div> */}
 
       <div>
         {/** Day Headers */}
@@ -168,7 +177,12 @@ export default function CalendarPage({
             const activitiesPerDay = currentWeekActivities.filter(
               (ca) => ca.day === day,
             );
-
+            const swappingActivityOptionsPerDay = swapingActivityOptions.filter(
+              (a) => a.day === day,
+            );
+            const selectingSubjectActivityOptionsPd =
+              selectingSubjectActivityOptions.filter((ac) => ac.day === day) ||
+              [];
             return (
               <div key={day} className="relative">
                 {TIMES.map((hour) => {
@@ -185,8 +199,17 @@ export default function CalendarPage({
                 <Dropzone
                   key={`${day}-dropzone`}
                   activities={activitiesPerDay}
-                  onChangeActivity={onChangeActivity}
+                  swappingOptions={swappingActivityOptionsPerDay}
+                  selectingSubjectActivityOptions={
+                    selectingSubjectActivityOptionsPd
+                  }
+                  availableActivities={availableActivities}
+                  onClickSwap={onClickSwap}
                   onDeselectActivity={onDeselectActivity}
+                  onSwapTo={onSwapTo}
+                  onSelectActivityFromSelectingSubject={
+                    onSelectActivityFromSelectingSubject
+                  }
                 />
               </div>
             );

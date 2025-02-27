@@ -1,44 +1,22 @@
+import { isOverlap } from "@/lib/dateHelpers";
 import { Fragment } from "react/jsx-runtime";
 import { ActivityType } from "../../types/common";
 import Activity from "../activity/Activity";
 
 interface DropzoneProps {
   activities: ActivityType[];
-  onChangeActivity: (
-    oldActivity: ActivityType,
-    newActivity: ActivityType,
-  ) => void;
+  swappingOptions: ActivityType[];
+  availableActivities: ActivityType[];
+  selectingSubjectActivityOptions: ActivityType[];
+  onClickSwap: (swappingout: ActivityType) => void;
   onDeselectActivity: (activity: ActivityType) => void;
+  onSwapTo: (swappingin: ActivityType) => void;
+  onSelectActivityFromSelectingSubject: (swappingin: ActivityType) => void;
 }
 
 interface OverlapGroupType {
   groupId: string;
   columns: ActivityType[][];
-}
-
-/**
- * Checks if two activities overlap based on their start and end times.
- *
- * @param activity1Date - A tuple containing the start and end Date objects for the first activity.
- * @param activity2Date - A tuple containing the start and end Date objects for the second activity.
- * @returns A boolean indicating whether the two activities overlap.
- */
-function isOverlap(
-  activity1Date: [Date, Date],
-  activity2Date: [Date, Date],
-): boolean {
-  const [startTime1, endTime1] = activity1Date;
-  const [startTime2, endTime2] = activity2Date;
-
-  if (startTime2 >= startTime1 && startTime2 < endTime1) {
-    return true;
-  }
-
-  // if subject2 ends between duration of subject1
-  if (endTime2 > startTime1 && endTime2 <= endTime1) {
-    return true;
-  }
-  return false;
 }
 
 function getOverlapGroups(activities: ActivityType[]): OverlapGroupType[] {
@@ -112,12 +90,23 @@ function findGroup(
 
 export default function Dropzone({
   activities,
-  onChangeActivity,
+  swappingOptions,
+  selectingSubjectActivityOptions,
+  availableActivities,
+  onClickSwap,
   onDeselectActivity,
+  onSwapTo,
+  onSelectActivityFromSelectingSubject,
 }: DropzoneProps): React.JSX.Element {
-  const groups = getOverlapGroups(activities);
-  console.log("groups", groups);
-
+  const groups = getOverlapGroups([
+    ...activities,
+    ...swappingOptions,
+    ...selectingSubjectActivityOptions,
+  ]);
+  const tempActivities = [
+    ...swappingOptions,
+    ...selectingSubjectActivityOptions,
+  ];
   return (
     <>
       {groups.map((group) => {
@@ -127,16 +116,34 @@ export default function Dropzone({
             {group.columns.map((activities, colNumber) => {
               return (
                 <Fragment key={colNumber}>
-                  {activities.map((activity) => (
-                    <Activity
-                      key={activity.id}
-                      activity={activity}
-                      colNumber={colNumber}
-                      maxColumns={group.columns.length}
-                      onChangeActivity={onChangeActivity}
-                      onDeselectActivity={onDeselectActivity}
-                    />
-                  ))}
+                  {activities.map((activity) => {
+                    const isOption =
+                      tempActivities.find((ha) => ha.id === activity.id) !==
+                      undefined;
+                    const hasRemainingOptions =
+                      availableActivities.filter(
+                        (ac) =>
+                          ac.code === activity.code &&
+                          ac.type === activity.type,
+                      ).length > 0;
+
+                    return (
+                      <Activity
+                        key={activity.id}
+                        activity={activity}
+                        colNumber={colNumber}
+                        maxColumns={group.columns.length}
+                        isOption={isOption}
+                        hasRemainingOptions={hasRemainingOptions}
+                        onClickSwap={onClickSwap}
+                        onDeselectActivity={onDeselectActivity}
+                        onSwapTo={onSwapTo}
+                        onSelectActivityFromSelectingSubject={
+                          onSelectActivityFromSelectingSubject
+                        }
+                      />
+                    );
+                  })}
                 </Fragment>
               );
             })}

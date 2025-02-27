@@ -5,12 +5,16 @@ interface SidebarProps {
   subjects: SubjectType[];
   onToggleActivity: (activity: ActivityType) => void;
   onDeSelectSubject: (activity: SubjectType) => void;
+  onSelectSubject: (subject: SubjectType) => void;
+  onRemoveSubject: (subject: SubjectType) => void;
 }
 
 export default function Sidebar({
   subjects,
   onToggleActivity,
   onDeSelectSubject,
+  onSelectSubject,
+  onRemoveSubject,
 }: SidebarProps): React.JSX.Element {
   return (
     <div className="border-r border-gray-200 bg-white">
@@ -22,6 +26,8 @@ export default function Sidebar({
             subject={subject}
             onToggleActivity={onToggleActivity}
             onDeSelectSubject={onDeSelectSubject}
+            onSelectSubject={onSelectSubject}
+            onRemoveSubject={onRemoveSubject}
           />
         ))}
       </div>

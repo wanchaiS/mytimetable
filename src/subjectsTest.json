@@ -1,0 +1,101 @@
+[
+  {
+    "code": "32130_AUT_U_1_S",
+    "name": "Fundamentals of Data Analytics",
+    "type": "Wrk1",
+    "activity": "01",
+    "day": "Wed",
+    "time": "14:00",
+    "room": "CB02.05.150",
+    "duration": "3 hrs",
+    "weeks": "19/2-9/4, 23/4-14/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "01",
+    "day": "Tue",
+    "time": "19:00",
+    "room": "CB11.B1.402",
+    "duration": "2 hrs",
+    "weeks": "25/2-8/4, 22/4-13/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "02",
+    "day": "Tue",
+    "time": "19:00",
+    "room": "CB11.B1.403",
+    "duration": "2 hrs",
+    "weeks": "25/2-8/4, 22/4-13/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "03",
+    "day": "Thu",
+    "time": "18:00",
+    "room": "CB11.B1.402",
+    "duration": "2 hrs",
+    "weeks": "27/2-10/4, 24/4-15/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "04",
+    "day": "Thu",
+    "time": "18:00",
+    "room": "CB11.B1.403",
+    "duration": "2 hrs",
+    "weeks": "27/2-10/4, 24/4-15/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "05",
+    "day": "Thu",
+    "time": "16:00",
+    "room": "CB11.B1.102",
+    "duration": "2 hrs",
+    "weeks": "27/2-10/4, 24/4-15/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "06",
+    "day": "Fri",
+    "time": "18:00",
+    "room": "CB11.B1.102",
+    "duration": "2 hrs",
+    "weeks": "28/2-11/4, 2/5-23/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Cmp1",
+    "activity": "07",
+    "day": "Thu",
+    "time": "18:00",
+    "room": "CB11.B1.102",
+    "duration": "2 hrs",
+    "weeks": "27/2-10/4, 24/4-15/5"
+  },
+  {
+    "code": "32547_AUT_U_1_S",
+    "name": "UNIX Systems Programming",
+    "type": "Olr1",
+    "activity": "01",
+    "day": "Tue",
+    "time": "18:00",
+    "room": "ONLINE133",
+    "duration": "1 hr",
+    "weeks": "18/2-8/4, 22/4-13/5"
+  }
+]

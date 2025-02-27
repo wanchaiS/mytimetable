@@ -21,7 +21,7 @@ export function getSubjects(
       const newSubject: SubjectType = {
         name: activity.name,
         code: activity.code,
-        selected: false,
+        fullyEnrolled: false,
         activities: [activity],
       };
       subjects.push(newSubject);
@@ -45,9 +45,35 @@ function parseActivity(subjectActivityInput: ActivityTypeInput): ActivityType {
     dates: activityDates,
     startEndTime: getTime(activityBody.time, duration),
     selected: false,
+    codeType: `${activityBody.code}|${activityBody.type}`,
   };
 
   return activity;
+}
+
+/**
+ * Checks if two activities overlap based on their start and end times.
+ *
+ * @param activity1Date - A tuple containing the start and end Date objects for the first activity.
+ * @param activity2Date - A tuple containing the start and end Date objects for the second activity.
+ * @returns A boolean indicating whether the two activities overlap.
+ */
+export function isOverlap(
+  activity1Date: [Date, Date],
+  activity2Date: [Date, Date],
+): boolean {
+  const [startTime1, endTime1] = activity1Date;
+  const [startTime2, endTime2] = activity2Date;
+
+  if (startTime2 >= startTime1 && startTime2 < endTime1) {
+    return true;
+  }
+
+  // if subject2 ends between duration of subject1
+  if (endTime2 > startTime1 && endTime2 <= endTime1) {
+    return true;
+  }
+  return false;
 }
 
 function getFullDate(date: Date): string {
