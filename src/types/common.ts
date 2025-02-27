@@ -47,4 +47,4 @@ export type Day =
   | "Saturday"
   | "Sunday";
 
-export type Preference = "MostTimeEfficient" | "EarlyBird" | "NightOwl";
+export type Preference = "Morning" | "Late";

@@ -7,9 +7,10 @@ interface CodeTypeGroupType {
 
 export function suggest(
   subjects: SubjectType[],
-  preference: Preference = "MostTimeEfficient",
-  preferenceWeight: number = 1,
+  preference: Preference = "Late",
 ): ActivityType[][] {
+  // TODO: subjects needs to be validated, the suggestion would not work
+  //  if one of the subject is not selectable
   const groups = groupBySubjectCodeType(subjects);
 
   // generate combinations
@@ -21,13 +22,13 @@ export function suggest(
   let bestCombinations: ActivityType[][] = [];
   for (let i = 0; i < allCombinations.length; i++) {
     const combination = allCombinations[i];
-    const score = calculateScore(combination, preference, preferenceWeight);
+    const score = calculateScore(combination, preference);
+    if (score === bestScore) {
+      bestCombinations.push(combination);
+    }
     if (score < bestScore) {
       bestScore = score;
       bestCombinations = [combination];
-    }
-    if (score === bestScore) {
-      bestCombinations.push(combination);
     }
   }
   return bestCombinations;
@@ -36,27 +37,10 @@ export function suggest(
 function calculateScore(
   combination: ActivityType[],
   preference: Preference,
-  preferenceWeight: number,
 ): number {
-  if (preference === "MostTimeEfficient") {
-    return calculateMostTimeEfficient(combination, preferenceWeight);
-  }
-  if (preference === "EarlyBird") {
-    return 0;
-  }
-  if (preference === "NightOwl") {
-    return 0;
-  }
-  return Infinity;
-}
-
-function calculateMostTimeEfficient(
-  combination: ActivityType[],
-  preferenceWeight: number,
-): number {
-  // MostTimeEfficient deter by
+  // Point based system
   // Active days (the day that has a class), the less days the better score(less score)
-  // gap time during the active day, the lesser gap between class the better score (less score)
+  // Gap time during the active day, the lesser gap between class the better score (less score)
 
   let points = 0;
   const activeDays = [...new Set(combination.map((ac) => ac.day))].filter(
@@ -66,6 +50,13 @@ function calculateMostTimeEfficient(
 
   const gapPoints = calculateGap(activeDays, combination);
   points += gapPoints;
+
+  // tie breaker with preference
+  if (preference === "Late") {
+    points += calculateLateScore(combination);
+  } else if (preference === "Morning") {
+    points += calculateMorningScore(combination);
+  }
 
   return points;
 }
@@ -96,6 +87,36 @@ function calculateGap(activeDays: Day[], combination: ActivityType[]): number {
   });
 
   return totalGapPw;
+}
+
+function calculateMorningScore(weekActivities: ActivityType[]): number {
+  if (weekActivities.length === 0) {
+    return Infinity;
+  }
+  let totalStartTime = 0;
+  weekActivities.forEach((activity) => {
+    totalStartTime +=
+      activity.startEndTime[0].getMinutes() +
+      activity.startEndTime[0].getHours() * 60;
+  });
+  const averageStartTime = totalStartTime / weekActivities.length;
+  return averageStartTime * 100;
+}
+
+function calculateLateScore(weekActivities: ActivityType[]): number {
+  if (weekActivities.length === 0) {
+    return Infinity;
+  }
+  let totalStartTime = 0;
+  weekActivities.forEach((activity) => {
+    totalStartTime +=
+      activity.startEndTime[0].getMinutes() +
+      activity.startEndTime[0].getHours() * 60;
+  });
+  const averageStartTime = totalStartTime / weekActivities.length;
+
+  // 1440 is minutes in a day
+  return (1440 - averageStartTime) * 100;
 }
 
 function generateActivityCombination(

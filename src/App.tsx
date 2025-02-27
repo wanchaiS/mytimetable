@@ -42,18 +42,12 @@ function App() {
     all: ActivityType[][];
     currentSuggestionIdx: number;
   }>({ all: [], currentSuggestionIdx: 0 });
-  const [preference, setPreference] = useState<Preference>("MostTimeEfficient");
-
-  suggest(subjects);
+  const [preference, setPreference] = useState<Preference>("Late");
 
   const selectMode =
     swappingActivity !== undefined || selectingSubject !== undefined;
   console.log("suggestions", suggestions.all);
   console.log("subjects", subjects);
-  console.log(
-    "current suggestion",
-    suggestions.all[suggestions.currentSuggestionIdx],
-  );
 
   function handleToggleActivity(activity: ActivityType) {
     setSubjects(
@@ -353,11 +347,8 @@ function App() {
                       setPreference(e.target.value as Preference)
                     }
                   >
-                    <option value="MostTimeEfficient">
-                      Most Time Efficient
-                    </option>
-                    <option value="EarlyBird">Early bird</option>
-                    <option value="NightOwl">Night owl</option>
+                    <option value="Late">Late</option>
+                    <option value="Morning">Morning</option>
                   </select>
                   <Button onClick={() => handleSuggest()}>Suggest</Button>
                   <Button
