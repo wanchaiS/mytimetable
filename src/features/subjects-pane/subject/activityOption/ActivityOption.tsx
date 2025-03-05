@@ -1,8 +1,8 @@
-import { DAY_ABBREVIATIONS } from "@/calendar/constants";
 import ActivityBadge from "@/components/ui/activitybadge";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ActivityType, Day } from "@/types/common";
+import { DAY_ABBREVIATIONS } from "@/features/calendar/constants";
+import { ActivityType, Day } from "@/types";
 
 interface ActivityOptionProps {
   activity: ActivityType;

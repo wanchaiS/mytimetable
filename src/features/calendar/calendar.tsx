@@ -1,9 +1,9 @@
-import { AppContext } from "@/App";
+import { AppContext } from "@/app";
 import { use, useEffect, useRef, useState } from "react";
-import { getStartEndWeekDate, isSameDay } from "../lib/dateHelpers";
-import { ActivityType, SubjectType } from "../types/common";
+import { getStartEndWeekDate, isSameDay } from "../../lib/dateHelpers";
+import { ActivityType, SubjectType } from "../../types";
 import { DAY_ABBREVIATIONS } from "./constants";
-import Dropzone from "./dropzone/Dropzone";
+import Dropzone from "./drop-zone";
 
 function getTimes(): string[] {
   return Array.from({ length: 48 }, (_, i) => {
@@ -30,7 +30,7 @@ function getTimes(): string[] {
   });
 }
 
-interface CalendarPageProp {
+interface CalendarProp {
   subjects: SubjectType[];
   onSwapTo: (swappingin: ActivityType) => void;
   onClickSwap: (swappingout: ActivityType) => void;
@@ -66,13 +66,13 @@ function getDayName(date: Date) {
   return days[date.getDay()];
 }
 
-export default function CalendarPage({
+export default function Calendar({
   subjects,
   onSwapTo,
   onClickSwap,
   onDeselectActivity,
   onSelectActivityFromSelectingSubject,
-}: CalendarPageProp): React.JSX.Element {
+}: CalendarProp): React.JSX.Element {
   const startHourRef = useRef<HTMLDivElement | null>(null);
   const [days, setDays] = useState<Date[]>(getDatesOfWeek());
   const [currentWeek, setCurrentWeek] = useState<number>(0);

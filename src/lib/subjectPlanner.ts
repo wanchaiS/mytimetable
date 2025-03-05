@@ -1,4 +1,4 @@
-import { ActivityType, Day, Preference, SubjectType } from "@/types/common";
+import { ActivityType, Day, Preference, SubjectType } from "@/types";
 import { isOverlap } from "./dateHelpers";
 
 interface CodeTypeGroupType {

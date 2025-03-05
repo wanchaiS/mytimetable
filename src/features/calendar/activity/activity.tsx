@@ -4,10 +4,10 @@ import { Popover } from "@/components/ui/popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { ArrowLeftRight, CalendarX2 } from "lucide-react";
 import React, { use, useState } from "react";
-import { cn } from "../../lib/utils";
-import { ActivityType } from "../../types/common";
+import { cn } from "../../../lib/utils";
+import { ActivityType } from "../../../types";
 
-import { AppContext } from "@/App";
+import { AppContext } from "@/app";
 import AnimateBoarderContainer from "@/components/animateBorderContainer/AnimateBoarderContainer";
 import { Button } from "@/components/ui/button";
 import "./style.css";

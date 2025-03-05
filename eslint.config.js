@@ -9,6 +9,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   { ignores: ['dist'] },
+  ...pluginQuery.configs['flat/recommended'],
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended,prettier],
     files: ['**/*.{ts,tsx}'],
@@ -18,17 +19,15 @@ export default tseslint.config(
     },
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-      '@tanstack/query': pluginQuery,
-
+      'react-refresh': reactRefresh,      
     },
     rules: {
-      ...pluginQuery.configs['flat/recommended'],
-      ...reactHooks.configs.recommended.rules,
+       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
     },
   },
+
 )

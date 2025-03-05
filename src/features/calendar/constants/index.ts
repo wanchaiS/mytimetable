@@ -1,4 +1,4 @@
-import { Day } from "../../types/common";
+import { Day } from "../../../types";
 
 export const DAY_ABBREVIATIONS: Record<string, Day> = Object.freeze({
   Mon: "Monday",

@@ -1,7 +1,7 @@
 import { isOverlap } from "@/lib/dateHelpers";
 import { Fragment } from "react/jsx-runtime";
-import { ActivityType } from "../../types/common";
-import Activity from "../activity/Activity";
+import { ActivityType } from "../../types";
+import Activity from "./activity/activity";
 
 interface DropzoneProps {
   activities: ActivityType[];

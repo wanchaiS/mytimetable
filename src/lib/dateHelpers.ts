@@ -1,5 +1,5 @@
-import { DAY_ABBREVIATIONS } from "../calendar/constants";
-import { ActivityType, ActivityTypeInput, SubjectType } from "../types/common";
+import { DAY_ABBREVIATIONS } from "../features/calendar/constants";
+import { ActivityType, ActivityTypeInput, SubjectType } from "../types";
 
 // group activities by subject code
 export function getSubjects(
@@ -21,7 +21,6 @@ export function getSubjects(
       const newSubject: SubjectType = {
         name: activity.name,
         code: activity.code,
-        fullyEnrolled: false,
         activities: [activity],
       };
       subjects.push(newSubject);

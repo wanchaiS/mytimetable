@@ -1,7 +1,7 @@
-import Subject from "../subject/Subject";
-import { ActivityType, SubjectType } from "../types/common";
+import Subject from "../../subject/Subject";
+import { ActivityType, SubjectType } from "../../types";
 
-interface SidebarProps {
+interface SubjectsPaneProps {
   subjects: SubjectType[];
   onToggleActivity: (activity: ActivityType) => void;
   onDeSelectSubject: (activity: SubjectType) => void;
@@ -9,13 +9,13 @@ interface SidebarProps {
   onRemoveSubject: (subject: SubjectType) => void;
 }
 
-export default function Sidebar({
+export default function SubjectsPane({
   subjects,
   onToggleActivity,
   onDeSelectSubject,
   onSelectSubject,
   onRemoveSubject,
-}: SidebarProps): React.JSX.Element {
+}: SubjectsPaneProps): React.JSX.Element {
   return (
     <div className="border-r border-gray-200 bg-white">
       <div className="border-b border-gray-200 p-4">My Subjects</div>

@@ -1,4 +1,4 @@
-import { AppContext } from "@/App";
+import { AppContext } from "@/app";
 import {
   Card,
   CardContent,

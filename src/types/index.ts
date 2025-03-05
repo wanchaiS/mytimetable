@@ -1,7 +1,6 @@
 export interface SubjectType {
   code: string;
   name: string;
-  fullyEnrolled: boolean;
   activities: ActivityType[];
 }
 
