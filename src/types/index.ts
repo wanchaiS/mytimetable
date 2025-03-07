@@ -1,8 +1,11 @@
 export interface SubjectType {
   code: string;
   name: string;
+  semester: Semester;
   activities: ActivityType[];
 }
+
+export type Semester = "Autumn" | "Spring" | "Summer";
 
 export interface ActivityType {
   code: string;
@@ -17,6 +20,7 @@ export interface ActivityType {
   id: string;
   selected: boolean;
   codeType: string;
+  semester: Semester;
 }
 
 export interface ActivityTypeInput {
@@ -29,6 +33,7 @@ export interface ActivityTypeInput {
   room: string;
   duration: string;
   weeks: string;
+  semester: string;
 }
 
 export interface AppContextType {

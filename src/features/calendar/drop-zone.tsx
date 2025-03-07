@@ -1,4 +1,6 @@
+import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
 import { isOverlap } from "@/lib/dateHelpers";
+import { use } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { ActivityType } from "../../types";
 import Activity from "./activity/activity";
@@ -6,12 +8,6 @@ import Activity from "./activity/activity";
 interface DropzoneProps {
   activities: ActivityType[];
   swappingOptions: ActivityType[];
-  availableActivities: ActivityType[];
-  selectingSubjectActivityOptions: ActivityType[];
-  onClickSwap: (swappingout: ActivityType) => void;
-  onDeselectActivity: (activity: ActivityType) => void;
-  onSwapTo: (swappingin: ActivityType) => void;
-  onSelectActivityFromSelectingSubject: (swappingin: ActivityType) => void;
 }
 
 interface OverlapGroupType {
@@ -91,22 +87,14 @@ function findGroup(
 export default function Dropzone({
   activities,
   swappingOptions,
-  selectingSubjectActivityOptions,
-  availableActivities,
-  onClickSwap,
-  onDeselectActivity,
-  onSwapTo,
-  onSelectActivityFromSelectingSubject,
 }: DropzoneProps): React.JSX.Element {
-  const groups = getOverlapGroups([
-    ...activities,
-    ...swappingOptions,
-    ...selectingSubjectActivityOptions,
-  ]);
-  const tempActivities = [
-    ...swappingOptions,
-    ...selectingSubjectActivityOptions,
-  ];
+  const { subjects } = use(DashboardContext);
+  const groups = getOverlapGroups([...activities, ...swappingOptions]);
+  const tempActivities = [...swappingOptions];
+
+  const availableActivities = subjects
+    .flatMap((sub) => sub.activities)
+    .filter((ac) => !ac.selected);
   return (
     <>
       {groups.map((group) => {
@@ -135,12 +123,6 @@ export default function Dropzone({
                         maxColumns={group.columns.length}
                         isOption={isOption}
                         hasRemainingOptions={hasRemainingOptions}
-                        onClickSwap={onClickSwap}
-                        onDeselectActivity={onDeselectActivity}
-                        onSwapTo={onSwapTo}
-                        onSelectActivityFromSelectingSubject={
-                          onSelectActivityFromSelectingSubject
-                        }
                       />
                     );
                   })}

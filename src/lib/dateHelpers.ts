@@ -1,5 +1,10 @@
-import { DAY_ABBREVIATIONS } from "../features/calendar/constants";
-import { ActivityType, ActivityTypeInput, SubjectType } from "../types";
+import { DAY_ABBREVIATIONS } from "../constants";
+import {
+  ActivityType,
+  ActivityTypeInput,
+  Semester,
+  SubjectType,
+} from "../types";
 
 // group activities by subject code
 export function getSubjects(
@@ -7,7 +12,7 @@ export function getSubjects(
 ): SubjectType[] {
   if (activitiesInput.length === 0) return [];
 
-  let subjects: SubjectType[] = [];
+  const subjects: SubjectType[] = [];
   // parse all activities, easier to group and calculate weeks after
   const parsedActivities = activitiesInput.map((inp) => parseActivity(inp));
 
@@ -21,6 +26,7 @@ export function getSubjects(
       const newSubject: SubjectType = {
         name: activity.name,
         code: activity.code,
+        semester: activity.semester,
         activities: [activity],
       };
       subjects.push(newSubject);
@@ -45,6 +51,7 @@ function parseActivity(subjectActivityInput: ActivityTypeInput): ActivityType {
     startEndTime: getTime(activityBody.time, duration),
     selected: false,
     codeType: `${activityBody.code}|${activityBody.type}`,
+    semester: activityBody.semester as Semester,
   };
 
   return activity;
@@ -98,7 +105,7 @@ function parseDates(inputRanges: string): Date[] {
     });
 
     const weeks = [];
-    let current = new Date(start);
+    const current = new Date(start);
 
     // Iterate week by week
     while (current <= end) {

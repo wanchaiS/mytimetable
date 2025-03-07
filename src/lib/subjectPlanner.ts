@@ -1,37 +1,53 @@
-import { ActivityType, Day, Preference, SubjectType } from "@/types";
+import { ActivityType, Day, Preference, Semester, SubjectType } from "@/types";
 import { isOverlap } from "./dateHelpers";
 
 interface CodeTypeGroupType {
   [key: string]: ActivityType[];
 }
 
+export type SuggestionsPerSemType = {
+  [semester in Semester]: ActivityType[][];
+};
+
+interface SubjectBySemType {
+  semester: Semester;
+  subjects: SubjectType[];
+}
+
 export function suggest(
   subjects: SubjectType[],
   preference: Preference = "Late",
-): ActivityType[][] {
+): SuggestionsPerSemType {
   // TODO: subjects needs to be validated, the suggestion would not work
-  //  if one of the subject is not selectable
-  const groups = groupBySubjectCodeType(subjects);
+  //  if one of the subject is not selectable (collide all)
 
-  // generate combinations
-  const groupsArray = Object.entries(groups);
-  const allCombinations = generateActivityCombination(groupsArray, 0);
+  const result: SuggestionsPerSemType = { Autumn: [], Spring: [], Summer: [] };
+  const semesters = groupSubjectsBySem(subjects);
+  for (let i = 0; i < semesters.length; i++) {
+    const groups = groupBySubjectCodeType(semesters[i].subjects);
 
-  // rate score
-  let bestScore = Infinity;
-  let bestCombinations: ActivityType[][] = [];
-  for (let i = 0; i < allCombinations.length; i++) {
-    const combination = allCombinations[i];
-    const score = calculateScore(combination, preference);
-    if (score === bestScore) {
-      bestCombinations.push(combination);
+    // generate combinations
+    const groupsArray = Object.entries(groups);
+    const allCombinations = generateActivityCombination(groupsArray, 0);
+
+    // rate score
+    let bestScore = Infinity;
+    let bestCombinations: ActivityType[][] = [];
+    for (let i = 0; i < allCombinations.length; i++) {
+      const combination = allCombinations[i];
+      const score = calculateScore(combination, preference);
+      if (score === bestScore) {
+        bestCombinations.push(combination);
+      }
+      if (score < bestScore) {
+        bestScore = score;
+        bestCombinations = [combination];
+      }
     }
-    if (score < bestScore) {
-      bestScore = score;
-      bestCombinations = [combination];
-    }
+    result[semesters[i].semester] = bestCombinations;
   }
-  return bestCombinations;
+
+  return result;
 }
 
 function calculateScore(
@@ -154,6 +170,21 @@ function generateActivityCombination(
     }
   }
   return results;
+}
+
+function groupSubjectsBySem(subjects: SubjectType[]): SubjectBySemType[] {
+  return subjects.reduce(
+    (acc: SubjectBySemType[], cur: SubjectType): SubjectBySemType[] => {
+      const idx = acc.findIndex((a) => a.semester === cur.semester);
+      if (idx === -1) {
+        acc.push({ semester: cur.semester, subjects: [cur] });
+      } else {
+        acc[idx].subjects.push(cur);
+      }
+      return acc;
+    },
+    [],
+  );
 }
 
 function groupBySubjectCodeType(subjects: SubjectType[]): CodeTypeGroupType {

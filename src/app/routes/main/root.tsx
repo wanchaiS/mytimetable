@@ -1,3 +1,4 @@
+import Layout from "@/components/layouts/Layout";
 import { Outlet } from "react-router";
 
 export const ErrorBoundary = () => {
@@ -6,9 +7,9 @@ export const ErrorBoundary = () => {
 
 const AppRoot = () => {
   return (
-    // <Layout>
-    <Outlet />
-    // </Layout>
+    <Layout>
+      <Outlet />
+    </Layout>
   );
 };
 

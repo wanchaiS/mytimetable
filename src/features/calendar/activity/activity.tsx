@@ -7,9 +7,9 @@ import React, { use, useState } from "react";
 import { cn } from "../../../lib/utils";
 import { ActivityType } from "../../../types";
 
-import { AppContext } from "@/app";
 import AnimateBoarderContainer from "@/components/animateBorderContainer/AnimateBoarderContainer";
 import { Button } from "@/components/ui/button";
+import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
 import "./style.css";
 
 interface ActivityProps {
@@ -86,7 +86,7 @@ export default function Activity({
   onSelectActivityFromSelectingSubject,
 }: ActivityProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const { swappingActivity, selectMode } = use(AppContext);
+  const { swappingActivity } = use(DashboardContext);
   const swapMode = swappingActivity !== undefined;
   const isSwapOrigin = swappingActivity?.id === activity.id;
 
@@ -95,7 +95,7 @@ export default function Activity({
   const width = getWidth(maxColumns);
   const left = width * colNumber;
 
-  if (isOption && selectMode) {
+  if (isOption && swapMode) {
     return (
       <div
         className="absolute pr-2 pb-1"
@@ -124,7 +124,7 @@ export default function Activity({
   }
 
   return (
-    <Popover open={open && !selectMode} onOpenChange={setOpen}>
+    <Popover open={open && !swapMode} onOpenChange={setOpen}>
       <PopoverTrigger
         asChild
         onMouseEnter={() => setOpen(true)}
@@ -133,7 +133,7 @@ export default function Activity({
         <div
           className={cn(
             "absolute pr-2 pb-1 hover:brightness-75",
-            `${selectMode ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
+            `${swapMode ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
           )}
           style={{
             top: `${top}px`,
@@ -162,7 +162,7 @@ export default function Activity({
               )}
             </div>
           </div>
-          {selectMode && isSwapOrigin && (
+          {swapMode && isSwapOrigin && (
             <div
               className="absolute pr-2 pb-1"
               style={{
@@ -200,23 +200,22 @@ export default function Activity({
         )}
         <div
           onClick={() =>
-            !selectMode && hasRemainingOptions && onClickSwap(activity)
+            !swapMode && hasRemainingOptions && onClickSwap(activity)
           }
           className={cn(
             "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
             {
-              "cursor-not-allowed opacity-50":
-                selectMode || !hasRemainingOptions,
+              "cursor-not-allowed opacity-50": swapMode || !hasRemainingOptions,
             },
           )}
         >
           <ArrowLeftRight color="#4ca03b" size={14} /> <span>Swap</span>
         </div>
         <div
-          onClick={() => !selectMode && onDeselectActivity(activity)}
+          onClick={() => !swapMode && onDeselectActivity(activity)}
           className={cn(
             "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
-            { "cursor-not-allowed opacity-50": selectMode },
+            { "cursor-not-allowed opacity-50": swapMode },
           )}
         >
           <CalendarX2 color="#a03b3b" size={14} />

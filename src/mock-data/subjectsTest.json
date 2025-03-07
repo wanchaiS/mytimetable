@@ -8,7 +8,8 @@
     "time": "14:00",
     "room": "CB02.05.150",
     "duration": "3 hrs",
-    "weeks": "19/2-9/4, 23/4-14/5"
+    "weeks": "19/2-9/4, 23/4-14/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -19,7 +20,8 @@
     "time": "09:00",
     "room": "CB11.B1.401",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -30,7 +32,8 @@
     "time": "11:00",
     "room": "CB11.B1.401",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -41,7 +44,8 @@
     "time": "13:00",
     "room": "CB11.B1.403",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -52,7 +56,8 @@
     "time": "09:00",
     "room": "CB11.B1.402",
     "duration": "2 hrs",
-    "weeks": "28/2-11/4, 2/5-23/5"
+    "weeks": "28/2-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -63,7 +68,8 @@
     "time": "10:00",
     "room": "CB11.B1.401",
     "duration": "2 hrs",
-    "weeks": "28/2-11/4, 2/5-23/5"
+    "weeks": "28/2-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -74,7 +80,8 @@
     "time": "12:00",
     "room": "CB11.B1.401",
     "duration": "2 hrs",
-    "weeks": "28/2-11/4, 2/5-23/5"
+    "weeks": "28/2-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -85,7 +92,8 @@
     "time": "13:00",
     "room": "CB11.B1.402",
     "duration": "2 hrs",
-    "weeks": "28/2-11/4, 2/5-23/5"
+    "weeks": "28/2-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "32516_AUT_U_1_S",
@@ -96,7 +104,8 @@
     "time": "09:00",
     "room": "ONLINE012",
     "duration": "1 hr",
-    "weeks": "18/2-8/4, 22/4-13/5"
+    "weeks": "18/2-8/4, 22/4-13/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -107,7 +116,8 @@
     "time": "19:00",
     "room": "CB11.B1.402",
     "duration": "2 hrs",
-    "weeks": "25/2-8/4, 22/4-13/5"
+    "weeks": "25/2-8/4, 22/4-13/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -118,7 +128,8 @@
     "time": "19:00",
     "room": "CB11.B1.403",
     "duration": "2 hrs",
-    "weeks": "25/2-8/4, 22/4-13/5"
+    "weeks": "25/2-8/4, 22/4-13/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -129,7 +140,8 @@
     "time": "18:00",
     "room": "CB11.B1.402",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -140,7 +152,8 @@
     "time": "18:00",
     "room": "CB11.B1.403",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -151,7 +164,8 @@
     "time": "16:00",
     "room": "CB11.B1.102",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -162,7 +176,8 @@
     "time": "18:00",
     "room": "CB11.B1.102",
     "duration": "2 hrs",
-    "weeks": "28/2-11/4, 2/5-23/5"
+    "weeks": "28/2-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -173,7 +188,8 @@
     "time": "18:00",
     "room": "CB11.B1.102",
     "duration": "2 hrs",
-    "weeks": "27/2-10/4, 24/4-15/5"
+    "weeks": "27/2-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "32547_AUT_U_1_S",
@@ -184,7 +200,8 @@
     "time": "18:00",
     "room": "ONLINE133",
     "duration": "1 hr",
-    "weeks": "18/2-8/4, 22/4-13/5"
+    "weeks": "18/2-8/4, 22/4-13/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -195,7 +212,8 @@
     "time": "18:00",
     "room": "CB11.B1.100",
     "duration": "1.5 hrs",
-    "weeks": "6/3-10/4, 24/4-15/5"
+    "weeks": "6/3-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -206,7 +224,8 @@
     "time": "19:30",
     "room": "CB11.B1.100",
     "duration": "1.5 hrs",
-    "weeks": "6/3-10/4, 24/4-15/5"
+    "weeks": "6/3-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -217,7 +236,8 @@
     "time": "10:30",
     "room": "CB11.B1.400",
     "duration": "1.5 hrs",
-    "weeks": "7/3-11/4, 2/5-23/5"
+    "weeks": "7/3-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -228,7 +248,8 @@
     "time": "09:00",
     "room": "CB11.B1.400",
     "duration": "1.5 hrs",
-    "weeks": "7/3-11/4, 2/5-23/5"
+    "weeks": "7/3-11/4, 2/5-23/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -239,7 +260,8 @@
     "time": "16:30",
     "room": "CB11.B1.400",
     "duration": "1.5 hrs",
-    "weeks": "5/3-9/4, 23/4-14/5"
+    "weeks": "5/3-9/4, 23/4-14/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -250,7 +272,8 @@
     "time": "18:00",
     "room": "CB11.B1.403",
     "duration": "1.5 hrs",
-    "weeks": "5/3-9/4, 23/4-14/5"
+    "weeks": "5/3-9/4, 23/4-14/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -261,7 +284,8 @@
     "time": "19:30",
     "room": "CB11.B1.403",
     "duration": "1.5 hrs",
-    "weeks": "5/3-9/4, 23/4-14/5"
+    "weeks": "5/3-9/4, 23/4-14/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -272,7 +296,8 @@
     "time": "16:30",
     "room": "CB11.B1.400",
     "duration": "1.5 hrs",
-    "weeks": "4/3-8/4, 22/4-13/5"
+    "weeks": "4/3-8/4, 22/4-13/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -283,7 +308,8 @@
     "time": "12:30",
     "room": "CB11.B1.100",
     "duration": "1.5 hrs",
-    "weeks": "6/3-10/4, 24/4-15/5"
+    "weeks": "6/3-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -294,7 +320,8 @@
     "time": "08:00",
     "room": "CB11.B1.100",
     "duration": "1.5 hrs",
-    "weeks": "6/3-10/4, 24/4-15/5"
+    "weeks": "6/3-10/4, 24/4-15/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -305,7 +332,8 @@
     "time": "18:00",
     "room": "ONLINE058",
     "duration": "3 hrs",
-    "weeks": "17/2-24/2, 12/5"
+    "weeks": "17/2-24/2, 12/5",
+    "semester": "Autumn"
   },
   {
     "code": "42904_AUT_U_1_S",
@@ -316,7 +344,8 @@
     "time": "18:00",
     "room": "ONLINE059",
     "duration": "1.5 hrs",
-    "weeks": "3/3-7/4, 21/4-5/5"
+    "weeks": "3/3-7/4, 21/4-5/5",
+    "semester": "Autumn"
   },
   {
     "code": "32998_SPR_U_1_S",
@@ -327,7 +356,8 @@
     "time": "12:00",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "29/7-16/9, 30/9-21/10"
+    "weeks": "29/7-16/9, 30/9-21/10",
+    "semester": "Spring"
   },
   {
     "code": "32998_SPR_U_1_S",
@@ -338,7 +368,8 @@
     "time": "15:00",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "31/7-18/9, 2/10-23/10"
+    "weeks": "31/7-18/9, 2/10-23/10",
+    "semester": "Spring"
   },
   {
     "code": "32998_SPR_U_1_S",
@@ -349,7 +380,8 @@
     "time": "16:30",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "31/7-18/9, 2/10-23/10"
+    "weeks": "31/7-18/9, 2/10-23/10",
+    "semester": "Spring"
   },
   {
     "code": "32998_SPR_U_1_S",
@@ -360,7 +392,8 @@
     "time": "10:30",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "29/7-16/9, 30/9-21/10"
+    "weeks": "29/7-16/9, 30/9-21/10",
+    "semester": "Spring"
   },
   {
     "code": "32509_SPR_U_1_S",
@@ -371,7 +404,8 @@
     "time": "10:00",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "30/7-17/9, 1/10-22/10"
+    "weeks": "30/7-17/9, 1/10-22/10",
+    "semester": "Spring"
   },
   {
     "code": "32509_SPR_U_1_S",
@@ -382,7 +416,8 @@
     "time": "16:30",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "30/7-17/9, 1/10-22/10"
+    "weeks": "30/7-17/9, 1/10-22/10",
+    "semester": "Spring"
   },
   {
     "code": "32509_SPR_U_1_S",
@@ -393,7 +428,8 @@
     "time": "11:30",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "30/7-17/9, 1/10-22/10"
+    "weeks": "30/7-17/9, 1/10-22/10",
+    "semester": "Spring"
   },
   {
     "code": "32509_SPR_U_1_S",
@@ -404,6 +440,7 @@
     "time": "10:30",
     "room": "Room shown 2 wks before\nsession",
     "duration": "1.5 hrs",
-    "weeks": "1/8-19/9, 3/10-24/10"
+    "weeks": "1/8-19/9, 3/10-24/10",
+    "semester": "Spring"
   }
 ]

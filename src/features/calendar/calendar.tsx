@@ -1,9 +1,9 @@
-import { AppContext } from "@/app";
+import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
 import { use, useEffect, useRef, useState } from "react";
+import { DAY_ABBREVIATIONS } from "../../constants";
 import { getStartEndWeekDate, isSameDay } from "../../lib/dateHelpers";
-import { ActivityType, SubjectType } from "../../types";
-import { DAY_ABBREVIATIONS } from "./constants";
 import Dropzone from "./drop-zone";
+import CalendarPanel from "./panel/calendar-panel";
 
 function getTimes(): string[] {
   return Array.from({ length: 48 }, (_, i) => {
@@ -30,22 +30,14 @@ function getTimes(): string[] {
   });
 }
 
-interface CalendarProp {
-  subjects: SubjectType[];
-  onSwapTo: (swappingin: ActivityType) => void;
-  onClickSwap: (swappingout: ActivityType) => void;
-  onDeselectActivity: (activity: ActivityType) => void;
-  onSelectActivityFromSelectingSubject: (activity: ActivityType) => void;
-}
-
 const cellWidth = 175;
 const cellheight = 40;
 const TIMES = getTimes();
 
 function getDatesOfWeek(date?: string): Date[] {
   const [startDateOfWeek] = getStartEndWeekDate(date);
-  let days: Date[] = [];
-  let cur = startDateOfWeek;
+  const days: Date[] = [];
+  const cur = startDateOfWeek;
   while (days.length < 7) {
     days.push(new Date(cur.getTime()));
     cur.setDate(cur.getDate() + 1);
@@ -66,35 +58,22 @@ function getDayName(date: Date) {
   return days[date.getDay()];
 }
 
-export default function Calendar({
-  subjects,
-  onSwapTo,
-  onClickSwap,
-  onDeselectActivity,
-  onSelectActivityFromSelectingSubject,
-}: CalendarProp): React.JSX.Element {
+export default function Calendar(): React.JSX.Element {
   const startHourRef = useRef<HTMLDivElement | null>(null);
   const [days, setDays] = useState<Date[]>(getDatesOfWeek());
   const [currentWeek, setCurrentWeek] = useState<number>(0);
-  const { swappingActivity, selectingSubject } = use(AppContext);
+  const { subjects, swappingActivity, semester } = use(DashboardContext);
+  const subjectsPerSem = subjects.filter((s) => s.semester === semester);
 
-  const selectedActivities = subjects
+  const selectedActivities = subjectsPerSem
     .flatMap((sub) => sub.activities)
     .filter((ac) => ac.selected);
 
-  const availableActivities = subjects
-    .flatMap((sub) => sub.activities)
-    .filter((ac) => !ac.selected);
-
-  const swapingActivityOptions = subjects
+  const swapingActivityOptions = subjectsPerSem
     .filter((sub) => sub.code === swappingActivity?.code)
     .flatMap((sub) => sub.activities)
     .filter((ac) => !ac.selected && swappingActivity?.type === ac.type);
 
-  const selectingSubjectActivityOptions = subjects
-    .filter((sub) => sub.code === selectingSubject?.code)
-    .flatMap((sub) => sub.activities)
-    .filter((ac) => !ac.selected);
   const currentWeekActivities =
     currentWeek === 0
       ? selectedActivities
@@ -109,37 +88,9 @@ export default function Calendar({
     }
   }, []);
 
-  function handlePreviousWeek() {
-    const firstD = days[0];
-    const prevDay = new Date(firstD.getTime());
-    prevDay.setDate(prevDay.getDate() - 1);
-    const lastDayOfPrevWeek = `${prevDay.getFullYear()}-${prevDay.getMonth() + 1}-${prevDay.getDate()}`;
-    setDays(getDatesOfWeek(lastDayOfPrevWeek));
-  }
-
-  function handleNextWeek() {
-    const lastD = days[6];
-    const nextDay = new Date(lastD.getTime());
-    nextDay.setDate(nextDay.getDate() + 1);
-    const firstDOfNextWeek = `${nextDay.getFullYear()}-${nextDay.getMonth() + 1}-${nextDay.getDate()}`;
-    setDays(getDatesOfWeek(firstDOfNextWeek));
-  }
-
   return (
     <div className="flex-1 flex-col border-r border-gray-200">
-      {/* <div className="flex">
-        <Button className="" onClick={() => handlePreviousWeek()}>
-          Back
-        </Button>
-
-        <div className="flex-1 p-4">
-          {currentWeek === 0
-            ? "All Weeks"
-            : `Week ${currentWeek} (${days[0].toDateString()} - ${days[days.length - 1].toDateString()})`}
-        </div>
-
-        <Button onClick={() => handleNextWeek()}>Next</Button>
-      </div> */}
+      <CalendarPanel />
 
       <div>
         {/** Day Headers */}
@@ -180,9 +131,7 @@ export default function Calendar({
             const swappingActivityOptionsPerDay = swapingActivityOptions.filter(
               (a) => a.day === day,
             );
-            const selectingSubjectActivityOptionsPd =
-              selectingSubjectActivityOptions.filter((ac) => ac.day === day) ||
-              [];
+
             return (
               <div key={day} className="relative">
                 {TIMES.map((hour) => {
@@ -200,16 +149,6 @@ export default function Calendar({
                   key={`${day}-dropzone`}
                   activities={activitiesPerDay}
                   swappingOptions={swappingActivityOptionsPerDay}
-                  selectingSubjectActivityOptions={
-                    selectingSubjectActivityOptionsPd
-                  }
-                  availableActivities={availableActivities}
-                  onClickSwap={onClickSwap}
-                  onDeselectActivity={onDeselectActivity}
-                  onSwapTo={onSwapTo}
-                  onSelectActivityFromSelectingSubject={
-                    onSelectActivityFromSelectingSubject
-                  }
                 />
               </div>
             );

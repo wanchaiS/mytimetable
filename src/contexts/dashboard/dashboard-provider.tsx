@@ -1,11 +1,11 @@
 import { getSubjects } from "@/lib/dateHelpers";
-import { ActivityType, Preference, SubjectType } from "@/types";
+import { ActivityType, Preference, Semester, SubjectType } from "@/types";
 import { ReactNode, useCallback, useMemo, useState } from "react";
 import mockDataTest from "../../mock-data/subjectsTest.json";
 
 import { suggest } from "@/lib/subjectPlanner";
 import { produce } from "immer";
-import { DashboardContext } from "./dashboard-context";
+import { DashboardContext, SuggestionType } from "./dashboard-context";
 
 function getIndexes(
   subjects: SubjectType[],
@@ -24,6 +24,14 @@ function getIndexes(
   return [subjectIdx, -1];
 }
 
+function getFirstSem(subjects: SubjectType[]): Semester {
+  if (subjects.length === 0) {
+    return "Autumn";
+  }
+  const sems = new Set(subjects.map((s) => s.semester));
+  return Array.from(sems).sort()[0];
+}
+
 type DashboardProviderProps = {
   children: ReactNode;
 };
@@ -35,14 +43,18 @@ export default function DashboardProvider({
     getSubjects(mockDataTest),
   );
 
+  const [semester, setSemester] = useState<Semester>(getFirstSem(subjects));
+
   const [swappingActivity, setSwappingActivity] = useState<
     ActivityType | undefined
   >();
 
-  const [suggestions, setSuggestions] = useState<{
-    all: ActivityType[][];
-    currentSuggestionIdx: number;
-  }>({ all: [], currentSuggestionIdx: 0 });
+  const [suggestions, setSuggestions] = useState<SuggestionType>({
+    all: { Autumn: [], Spring: [], Summer: [] },
+    currentSuggestionIdx: 0,
+    hasNext: false,
+    hasPrev: false,
+  });
 
   const [preference, setPreference] = useState<Preference>("Late");
 
@@ -105,10 +117,10 @@ export default function DashboardProvider({
     );
   };
 
-  const handleRemoveSubject = (subject: SubjectType) => {
+  const handleRemoveSubject = (subjectCode: string) => {
     setSubjects(
       produce((draft: SubjectType[]) => {
-        const [subjectIdx] = getIndexes(draft, undefined, subject);
+        const subjectIdx = draft.findIndex((s) => s.code === subjectCode);
         if (subjectIdx === -1) {
           return;
         }
@@ -119,34 +131,50 @@ export default function DashboardProvider({
 
   const handleSuggest = useCallback(() => {
     const combinations = suggest(subjects, preference);
-    if (combinations.length === 0) {
+    if (
+      combinations.Autumn.length === 0 &&
+      combinations.Spring.length === 0 &&
+      combinations.Summer.length === 0
+    ) {
       return;
     }
+
+    const suggestedSubjects = combinations[semester];
     // set the first suggestion to subjects
-    selectAcitivitiesBySuggestion(combinations[0]);
-    setSuggestions({ all: combinations, currentSuggestionIdx: 0 });
-  }, [preference, subjects]);
+    selectAcitivitiesBySuggestion(suggestedSubjects[0]);
+    setSuggestions({
+      all: combinations,
+      currentSuggestionIdx: 0,
+      hasNext: suggestedSubjects.length > 1,
+      hasPrev: false,
+    });
+  }, [preference, semester, subjects]);
 
   const handleNextSuggest = useCallback(() => {
-    if (suggestions.all.length === 0) {
+    if (suggestions.all[semester].length === 0) {
       return;
     }
 
-    if (suggestions.currentSuggestionIdx >= suggestions.all.length - 1) {
+    if (
+      suggestions.currentSuggestionIdx >=
+      suggestions.all[semester].length - 1
+    ) {
       return;
     }
 
     selectAcitivitiesBySuggestion(
-      suggestions.all[suggestions.currentSuggestionIdx + 1],
+      suggestions.all[semester][suggestions.currentSuggestionIdx + 1],
     );
     setSuggestions((prev) => ({
       ...prev,
       currentSuggestionIdx: prev.currentSuggestionIdx + 1,
+      hasNext: prev.currentSuggestionIdx + 1 < prev.all[semester].length - 1,
+      hasPrev: true,
     }));
-  }, [suggestions.all, suggestions.currentSuggestionIdx]);
+  }, [semester, suggestions.all, suggestions.currentSuggestionIdx]);
 
   const handlePrevSuggest = useCallback(() => {
-    if (suggestions.all.length === 0) {
+    if (suggestions.all[semester].length === 0) {
       return;
     }
 
@@ -155,13 +183,15 @@ export default function DashboardProvider({
     }
 
     selectAcitivitiesBySuggestion(
-      suggestions.all[suggestions.currentSuggestionIdx - 1],
+      suggestions.all[semester][suggestions.currentSuggestionIdx - 1],
     );
     setSuggestions((prev) => ({
       ...prev,
       currentSuggestionIdx: prev.currentSuggestionIdx - 1,
+      hasNext: true,
+      hasPrev: prev.currentSuggestionIdx - 1 !== 0,
     }));
-  }, [suggestions.all, suggestions.currentSuggestionIdx]);
+  }, [semester, suggestions.all, suggestions.currentSuggestionIdx]);
 
   const selectAcitivitiesBySuggestion = (suggestion: ActivityType[]) => {
     setSubjects(
@@ -191,11 +221,32 @@ export default function DashboardProvider({
     );
   };
 
+  const handleChangeSemester = useCallback(
+    (newSem: Semester) => {
+      if (suggestions.all[newSem].length > 0) {
+        const suggestedSubjects = suggestions.all[newSem];
+        // set the first suggestion to subjects
+        selectAcitivitiesBySuggestion(suggestedSubjects[0]);
+        setSuggestions((prev) => ({
+          ...prev,
+          currentSuggestionIdx: 0,
+          hasNext: suggestedSubjects.length > 1,
+          hasPrev: false,
+        }));
+      }
+
+      setSemester(newSem);
+    },
+    [suggestions.all],
+  );
+
   const ctxValues = useMemo(
     () => ({
       subjects,
       swappingActivity,
       suggestions,
+      preference,
+      semester,
       onToggleActivity: handleToggleActivity,
       onDeselectActivity: handleDeselectActivity,
       onSwapClicked: handleSwapClicked,
@@ -206,14 +257,18 @@ export default function DashboardProvider({
       onNextSuggest: handleNextSuggest,
       onPrevSuggest: handlePrevSuggest,
       onSetPreference: (pref: Preference) => setPreference(pref),
+      onChangeSemester: handleChangeSemester,
     }),
     [
+      handleChangeSemester,
       handleNextSuggest,
       handlePrevSuggest,
       handleSuggest,
       handleSwapActivity,
       handleSwapClicked,
       handleToggleActivity,
+      preference,
+      semester,
       subjects,
       suggestions,
       swappingActivity,
