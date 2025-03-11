@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar";
 import TimeBadge from "@/components/ui/timebadge";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
-import { ActivityType, Day, Preference, Semester } from "@/types";
+import { Day, Preference, Semester } from "@/types";
 import {
   ArrowBigLeft,
   ArrowBigRight,
@@ -45,45 +45,8 @@ import {
 } from "lucide-react";
 import React, { use, useState } from "react";
 
-type SidePaneSubjectType = {
-  code: string;
-  name: string;
-  activitiesByType: ActivityByTypeType;
-};
-
-type ActivityByTypeType = {
-  [type: string]: ActivityType[];
-};
-
-// function groupSubjects(subjects: SubjectType[]): SidePaneSubjectType[] {
-//   const result: SidePaneSubjectType[] = [];
-//   for (let i = 0; i < subjects.length; i++) {
-//     const subject = subjects[i];
-//     result.push({
-//       code: subject.code,
-//       name: subject.name,
-//       activitiesByType: groupAcByType(subject.activities),
-//     });
-//   }
-//   return result;
-// }
-
-// function groupAcByType(activities: ActivityType[]): ActivityByTypeType {
-//   return activities.reduce(
-//     (acc: ActivityByTypeType, cur: ActivityType): ActivityByTypeType => {
-//       if (acc[cur.type] !== undefined) {
-//         acc[cur.type].push(cur);
-//       } else {
-//         acc[cur.type] = [cur];
-//       }
-//       return acc;
-//     },
-//     {},
-//   );
-// }
-
 export default function SubjectsPane(): React.JSX.Element {
-  const [filterDays, setFilterDays] = useState<Day[]>([]);
+  const [filterDays] = useState<Day[]>([]);
   const {
     subjects,
     suggestions,

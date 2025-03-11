@@ -18,10 +18,6 @@ interface ActivityProps {
   colNumber: number;
   isOption: boolean;
   hasRemainingOptions: boolean;
-  onClickSwap: (swappingout: ActivityType) => void;
-  onDeselectActivity: (activity: ActivityType) => void;
-  onSwapTo: (swappingin: ActivityType) => void;
-  onSelectActivityFromSelectingSubject: (swappingin: ActivityType) => void;
 }
 
 function getHeight(activity: ActivityType): number {
@@ -80,13 +76,14 @@ export default function Activity({
   maxColumns,
   isOption,
   hasRemainingOptions,
-  onClickSwap,
-  onDeselectActivity,
-  onSwapTo,
-  onSelectActivityFromSelectingSubject,
 }: ActivityProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const { swappingActivity } = use(DashboardContext);
+  const {
+    swappingActivity,
+    onSwapActivity,
+    onSwapClicked,
+    onDeselectActivity,
+  } = use(DashboardContext);
   const swapMode = swappingActivity !== undefined;
   const isSwapOrigin = swappingActivity?.id === activity.id;
 
@@ -108,7 +105,7 @@ export default function Activity({
       >
         <AnimateBoarderContainer>
           <div
-            onClick={() => onSelectActivityFromSelectingSubject(activity)}
+            onClick={() => onSwapActivity(activity)}
             className={cn(
               "group bg-background relative flex h-full rounded-sm p-1 hover:brightness-90",
             )}
@@ -175,7 +172,7 @@ export default function Activity({
               <div className="animated-border h-full rounded-sm p-0.5">
                 <div className="hover:bg-secondary flex h-full w-full items-center justify-center opacity-0 hover:opacity-70">
                   <Button
-                    onClick={() => onSwapTo(activity)}
+                    onClick={() => onSwapActivity(activity)}
                     className="h-full w-full cursor-pointer"
                   >
                     Select
@@ -200,7 +197,7 @@ export default function Activity({
         )}
         <div
           onClick={() =>
-            !swapMode && hasRemainingOptions && onClickSwap(activity)
+            !swapMode && hasRemainingOptions && onSwapClicked(activity)
           }
           className={cn(
             "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",

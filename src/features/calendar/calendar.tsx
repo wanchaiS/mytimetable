@@ -60,8 +60,8 @@ function getDayName(date: Date) {
 
 export default function Calendar(): React.JSX.Element {
   const startHourRef = useRef<HTMLDivElement | null>(null);
-  const [days, setDays] = useState<Date[]>(getDatesOfWeek());
-  const [currentWeek, setCurrentWeek] = useState<number>(0);
+  const [days] = useState<Date[]>(getDatesOfWeek());
+  const [currentWeek] = useState<number>(0);
   const { subjects, swappingActivity, semester } = use(DashboardContext);
   const subjectsPerSem = subjects.filter((s) => s.semester === semester);
 
