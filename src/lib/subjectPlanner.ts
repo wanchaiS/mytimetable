@@ -146,7 +146,7 @@ function generateActivityCombination(
   }
 
   // try to combine with all the possible activities
-  const [_, activities] = groups[gIndex];
+  const [, activities] = groups[gIndex];
   const results: ActivityType[][] = [];
   for (const activity of activities) {
     // find if it's overlap with the current conbination
