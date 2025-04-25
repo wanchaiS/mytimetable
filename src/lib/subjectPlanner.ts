@@ -33,7 +33,7 @@ export function suggest(
     // find combinations of subject , assume total credit is 24 for now
     suggestion.subjectCombinations = buildSubjectCombinations(
       suggestion.subjects,
-      12,
+      24,
     );
 
     for (let j = 0; j < suggestion.subjectCombinations.length; j++) {
