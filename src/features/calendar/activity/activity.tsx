@@ -5,11 +5,11 @@ import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { ArrowLeftRight, CalendarX2 } from "lucide-react";
 import React, { use, useState } from "react";
 import { cn } from "../../../lib/utils";
-import { ActivityType } from "../../../types";
 
 import AnimateBoarderContainer from "@/components/animateBorderContainer/AnimateBoarderContainer";
 import { Button } from "@/components/ui/button";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
+import { ActivityType } from "@/hooks/useSubjects";
 import "./style.css";
 
 interface ActivityProps {
@@ -22,22 +22,14 @@ interface ActivityProps {
 
 function getHeight(activity: ActivityType): number {
   // get height from end time - start time
-  const [startTime, endTime] = activity.startEndTime;
-  const diffMs: number = endTime.getTime() - startTime.getTime();
-  const diffMinutes = diffMs / (1000 * 60);
+  const diffMinutes = activity.end_time_mins - activity.start_time_mins;
   const height = (diffMinutes / 30) * 40;
   return height;
 }
 
 function getTop(activity: ActivityType) {
-  const [startTime] = activity.startEndTime;
-
   // get top position from "how far is it from the 0:00AM"
-  const startTimeTable = new Date();
-  startTimeTable.setHours(0, 0, 0, 0);
-  const diffMs = startTime.getTime() - startTimeTable.getTime();
-  const diffMinutes = diffMs / (1000 * 60);
-  const top = (diffMinutes / 30) * 40;
+  const top = (activity.start_time_mins / 30) * 40;
   return top;
 }
 

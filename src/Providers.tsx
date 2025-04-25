@@ -2,16 +2,14 @@ import { MainErrorFallback } from "@/components/errors/main";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Loader } from "lucide-react";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-
-type AppProviderProps = {
-  children: React.ReactNode;
-};
+import { Outlet } from "react-router";
+import Layout from "./components/layouts/Layout";
 
 const queryClient = new QueryClient();
 
-export function AppProvider({ children }: AppProviderProps) {
+export function Providers() {
   return (
     <Suspense
       fallback={
@@ -22,7 +20,9 @@ export function AppProvider({ children }: AppProviderProps) {
     >
       <ErrorBoundary FallbackComponent={MainErrorFallback}>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <Layout>
+            <Outlet />
+          </Layout>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </ErrorBoundary>

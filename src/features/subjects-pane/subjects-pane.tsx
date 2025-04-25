@@ -33,23 +33,25 @@ import {
 } from "@/components/ui/sidebar";
 import TimeBadge from "@/components/ui/timebadge";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
-import { Day, Preference, Semester } from "@/types";
+import { Day } from "@/hooks/useSubjects";
+import { Preference } from "@/types";
 import {
   ArrowBigLeft,
   ArrowBigRight,
   ChevronRight,
-  CirclePlus,
   Filter,
   Sparkles,
   Trash2,
 } from "lucide-react";
 import React, { use, useState } from "react";
+import SearchSubjects from "./search-subjects/search-subjects";
 
 export default function SubjectsPane(): React.JSX.Element {
   const [filterDays] = useState<Day[]>([]);
+
   const {
     subjects,
-    suggestions,
+    suggestionsController,
     preference,
     semester,
     onToggleActivity,
@@ -72,9 +74,10 @@ export default function SubjectsPane(): React.JSX.Element {
           }))
           .filter((sub) => sub.activities.length > 0)
       : semSubjects;
-  // const groupedSubjects = groupSubjects(searchedSubjects);
+
   return (
     <Sidebar className="top-[40px]">
+      {/**Header section suggestions */}
       <SidebarHeader>
         <div className="flex items-center space-x-2">
           <RadioGroup
@@ -95,27 +98,35 @@ export default function SubjectsPane(): React.JSX.Element {
           </Button>
           <div>
             Suggestion:{" "}
-            {suggestions.all[semester].length > 0
-              ? suggestions.currentSuggestionIdx + 1
+            {suggestionsController.allSuggestedBySem.length > 0
+              ? suggestionsController.currentSuggestionIdx + 1
               : 0}
-            /{suggestions.all[semester].length}
+            /{suggestionsController.allSuggestedBySem.length}
           </div>
         </div>
 
-        <Button onClick={onPrevSuggest} disabled={!suggestions.hasPrev}>
+        <Button
+          onClick={onPrevSuggest}
+          disabled={!suggestionsController.hasPrev}
+        >
           <ArrowBigLeft /> <span>Prev</span>
         </Button>
-        <Button onClick={onNextSuggest} disabled={!suggestions.hasNext}>
+        <Button
+          onClick={onNextSuggest}
+          disabled={!suggestionsController.hasNext}
+        >
           <ArrowBigRight /> <span>Next</span>
         </Button>
       </SidebarHeader>
+
+      {/** Body where the subjects are */}
       <SidebarContent>
         <SidebarGroup className="border-t-1">
           <div className="flex items-center">
             <SidebarGroupLabel className="flex-1">Subjects</SidebarGroupLabel>
             <Select
               value={semester}
-              onValueChange={(sem: Semester) => onChangeSemester(sem)}
+              onValueChange={(sem) => onChangeSemester(sem)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select semester" />
@@ -125,15 +136,15 @@ export default function SubjectsPane(): React.JSX.Element {
                   <SelectItem value="Autumn">Autumn</SelectItem>
                   <SelectItem value="Spring">Spring</SelectItem>
                   <SelectItem value="Summer">Summer</SelectItem>
+                  <SelectItem value="N/A">N/A</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
             <Button className="mr-2" variant="outline" size="icon">
               <Filter size={16} />
             </Button>
-            <Button variant="outline" size="icon">
-              <CirclePlus fill="#84cc16" size={16} />
-            </Button>
+            {/** Search dialog */}
+            <SearchSubjects />
           </div>
           <SidebarMenu>
             {searchedSubjects.map((subject) => (
@@ -173,7 +184,7 @@ export default function SubjectsPane(): React.JSX.Element {
                             />
                             <TimeBadge
                               selected={activity.selected}
-                              startTime={activity.startEndTime[0]}
+                              startTime={activity.start_time}
                             />
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>

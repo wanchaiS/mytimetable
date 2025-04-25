@@ -1,11 +1,14 @@
-import { getSubjects } from "@/lib/dateHelpers";
-import { ActivityType, Preference, Semester, SubjectType } from "@/types";
 import { ReactNode, useCallback, useMemo, useState } from "react";
-import mockDataTest from "../../mock-data/subjectsTest.json";
 
+import useLocalStorage from "@/hooks/useStorage";
+import { ActivityType, SubjectType } from "@/hooks/useSubjects";
 import { suggest } from "@/lib/subjectPlanner";
+import { Preference } from "@/types";
 import { produce } from "immer";
-import { DashboardContext, SuggestionType } from "./dashboard-context";
+import {
+  DashboardContext,
+  SuggestionControllerType,
+} from "./dashboard-context";
 
 function getIndexes(
   subjects: SubjectType[],
@@ -24,7 +27,7 @@ function getIndexes(
   return [subjectIdx, -1];
 }
 
-function getFirstSem(subjects: SubjectType[]): Semester {
+function getFirstSem(subjects: SubjectType[]): string {
   if (subjects.length === 0) {
     return "Autumn";
   }
@@ -39,52 +42,63 @@ type DashboardProviderProps = {
 export default function DashboardProvider({
   children,
 }: DashboardProviderProps) {
-  const [subjects, setSubjects] = useState<SubjectType[]>(
-    getSubjects(mockDataTest),
+  const [subjects, setSubjects] = useLocalStorage<SubjectType[]>(
+    "subjects",
+    [],
   );
-
-  const [semester, setSemester] = useState<Semester>(getFirstSem(subjects));
+  console.log("subjects", subjects);
+  const [semester, setSemester] = useState(getFirstSem(subjects));
 
   const [swappingActivity, setSwappingActivity] = useState<
     ActivityType | undefined
   >();
 
-  const [suggestions, setSuggestions] = useState<SuggestionType>({
-    all: { Autumn: [], Spring: [], Summer: [] },
-    currentSuggestionIdx: 0,
-    hasNext: false,
-    hasPrev: false,
-  });
+  const [suggestionsController, setSuggestionsController] =
+    useState<SuggestionControllerType>({
+      allSuggestedBySem: [],
+      allSuggested: [],
+      currentSuggestionIdx: 0,
+      hasNext: false,
+      hasPrev: false,
+    });
+
+  console.log("suggestionsController", suggestionsController);
 
   const [preference, setPreference] = useState<Preference>("Late");
 
-  const handleToggleActivity = useCallback((activity: ActivityType) => {
-    setSubjects(
-      produce((draft: SubjectType[]) => {
-        const [subjectIdx, acIdx] = getIndexes(draft, activity);
-        // toggle activity
-        draft[subjectIdx].activities[acIdx].selected =
-          !draft[subjectIdx].activities[acIdx].selected;
+  const handleToggleActivity = useCallback(
+    (activity: ActivityType) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          const [subjectIdx, acIdx] = getIndexes(draft, activity);
+          // toggle activity
+          draft[subjectIdx].activities[acIdx].selected =
+            !draft[subjectIdx].activities[acIdx].selected;
 
-        // deselect the same type activities
-        draft[subjectIdx].activities.forEach((ac) => {
-          if (ac.id !== activity.id && ac.type === activity.type) {
-            ac.selected = false;
-          }
-        });
-      }),
-    );
-  }, []);
+          // deselect the same type activities
+          draft[subjectIdx].activities.forEach((ac) => {
+            if (ac.id !== activity.id && ac.type === activity.type) {
+              ac.selected = false;
+            }
+          });
+        }),
+      );
+    },
+    [setSubjects],
+  );
 
-  function handleDeselectActivity(activity: ActivityType) {
-    setSubjects(
-      produce((draft: SubjectType[]) => {
-        const [subjectIdx, acIdx] = getIndexes(draft, activity);
-        // deselect activity
-        draft[subjectIdx].activities[acIdx].selected = false;
-      }),
-    );
-  }
+  const handleDeselectActivity = useCallback(
+    (activity: ActivityType) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          const [subjectIdx, acIdx] = getIndexes(draft, activity);
+          // deselect activity
+          draft[subjectIdx].activities[acIdx].selected = false;
+        }),
+      );
+    },
+    [setSubjects],
+  );
 
   const handleSwapClicked = useCallback((swappingOut: ActivityType) => {
     setSwappingActivity(swappingOut);
@@ -102,149 +116,184 @@ export default function DashboardProvider({
     [handleToggleActivity, swappingActivity],
   );
 
-  const handleDeselectSubject = (subject: SubjectType) => {
-    setSubjects(
-      produce((draft: SubjectType[]) => {
-        const [subjectIdx] = getIndexes(draft, undefined, subject);
+  const handleDeselectSubject = useCallback(
+    (subject: SubjectType) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          const [subjectIdx] = getIndexes(draft, undefined, subject);
 
-        if (subjectIdx === -1) {
-          return;
-        }
-        draft[subjectIdx].activities.forEach((activity) => {
-          activity.selected = false;
-        });
-      }),
-    );
-  };
+          if (subjectIdx === -1) {
+            return;
+          }
+          draft[subjectIdx].activities.forEach((activity) => {
+            activity.selected = false;
+          });
+        }),
+      );
+    },
+    [setSubjects],
+  );
 
-  const handleRemoveSubject = (subjectCode: string) => {
-    setSubjects(
-      produce((draft: SubjectType[]) => {
-        const subjectIdx = draft.findIndex((s) => s.code === subjectCode);
-        if (subjectIdx === -1) {
-          return;
-        }
-        draft.splice(subjectIdx, 1);
-      }),
-    );
-  };
+  const handleAddSubject = useCallback(
+    (subject: SubjectType) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          draft.push(subject);
+        }),
+      );
+    },
+    [setSubjects],
+  );
+
+  const handleRemoveSubject = useCallback(
+    (subjectCode: string) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          const subjectIdx = draft.findIndex((s) => s.code === subjectCode);
+          if (subjectIdx === -1) {
+            return;
+          }
+          draft.splice(subjectIdx, 1);
+        }),
+      );
+    },
+    [setSubjects],
+  );
+
+  const selectAcitivitiesBySuggestion = useCallback(
+    (suggestion: ActivityType[]) => {
+      setSubjects(
+        produce((draft: SubjectType[]) => {
+          for (let i = 0; i < draft.length; i++) {
+            const subject = draft[i];
+            for (let j = 0; j < subject.activities.length; j++) {
+              const activity = subject.activities[j];
+              if (!suggestion.find((s) => s.id === activity.id)) {
+                activity.selected = false;
+              } else {
+                activity.selected = true;
+              }
+            }
+          }
+        }),
+      );
+    },
+    [setSubjects],
+  );
 
   const handleSuggest = useCallback(() => {
-    const combinations = suggest(subjects, preference);
-    if (
-      combinations.Autumn.length === 0 &&
-      combinations.Spring.length === 0 &&
-      combinations.Summer.length === 0
-    ) {
+    const suggestions = suggest(subjects, preference);
+    if (suggestions.length === 0) {
       return;
     }
 
-    const suggestedSubjects = combinations[semester];
+    const suggestionSem = suggestions.find((s) => s.semester === semester);
+    if (!suggestionSem) {
+      return;
+    }
+
+    const allBestCombo = suggestionSem.subjectCombinations.flatMap(
+      (sc) => sc.activityCombinations,
+    );
+
     // set the first suggestion to subjects
-    selectAcitivitiesBySuggestion(suggestedSubjects[0]);
-    setSuggestions({
-      all: combinations,
+    console.log("allBestCombo[0].activities", allBestCombo[0].activities);
+    selectAcitivitiesBySuggestion(allBestCombo[0].activities);
+    setSuggestionsController({
+      allSuggestedBySem: allBestCombo,
+      allSuggested: suggestions,
       currentSuggestionIdx: 0,
-      hasNext: suggestedSubjects.length > 1,
+      hasNext: allBestCombo.length > 1,
       hasPrev: false,
     });
-  }, [preference, semester, subjects]);
+  }, [preference, selectAcitivitiesBySuggestion, semester, subjects]);
 
   const handleNextSuggest = useCallback(() => {
-    if (suggestions.all[semester].length === 0) {
+    if (suggestionsController.allSuggestedBySem.length === 0) {
       return;
     }
 
     if (
-      suggestions.currentSuggestionIdx >=
-      suggestions.all[semester].length - 1
+      suggestionsController.currentSuggestionIdx >=
+      suggestionsController.allSuggestedBySem.length - 1
     ) {
       return;
     }
 
     selectAcitivitiesBySuggestion(
-      suggestions.all[semester][suggestions.currentSuggestionIdx + 1],
+      suggestionsController.allSuggestedBySem[
+        suggestionsController.currentSuggestionIdx + 1
+      ].activities,
     );
-    setSuggestions((prev) => ({
+    setSuggestionsController((prev) => ({
       ...prev,
       currentSuggestionIdx: prev.currentSuggestionIdx + 1,
-      hasNext: prev.currentSuggestionIdx + 1 < prev.all[semester].length - 1,
+      hasNext:
+        prev.currentSuggestionIdx + 1 < prev.allSuggestedBySem.length - 1,
       hasPrev: true,
     }));
-  }, [semester, suggestions.all, suggestions.currentSuggestionIdx]);
+  }, [
+    selectAcitivitiesBySuggestion,
+    suggestionsController.allSuggestedBySem,
+    suggestionsController.currentSuggestionIdx,
+  ]);
 
   const handlePrevSuggest = useCallback(() => {
-    if (suggestions.all[semester].length === 0) {
+    if (suggestionsController.allSuggestedBySem.length === 0) {
       return;
     }
 
-    if (suggestions.currentSuggestionIdx === 0) {
+    if (suggestionsController.currentSuggestionIdx === 0) {
       return;
     }
 
     selectAcitivitiesBySuggestion(
-      suggestions.all[semester][suggestions.currentSuggestionIdx - 1],
+      suggestionsController.allSuggestedBySem[
+        suggestionsController.currentSuggestionIdx - 1
+      ].activities,
     );
-    setSuggestions((prev) => ({
+    setSuggestionsController((prev) => ({
       ...prev,
       currentSuggestionIdx: prev.currentSuggestionIdx - 1,
       hasNext: true,
       hasPrev: prev.currentSuggestionIdx - 1 !== 0,
     }));
-  }, [semester, suggestions.all, suggestions.currentSuggestionIdx]);
-
-  const selectAcitivitiesBySuggestion = (suggestion: ActivityType[]) => {
-    setSubjects(
-      produce((draft: SubjectType[]) => {
-        for (let i = 0; i < suggestion.length; i++) {
-          const sugAc = suggestion[i];
-          const curSubIdx = draft.findIndex((s) => s.code === sugAc.code);
-          if (curSubIdx === -1) {
-            return;
-          }
-          // swap activity
-          const selected = draft[curSubIdx].activities.filter(
-            (ac) => ac.codeType === sugAc.codeType && ac.selected,
-          );
-          selected.forEach((se) => (se.selected = false));
-
-          const sugAcIdx = draft[curSubIdx].activities.findIndex(
-            (ac) => ac.id === sugAc.id,
-          );
-          if (sugAcIdx === -1) {
-            return;
-          }
-
-          draft[curSubIdx].activities[sugAcIdx].selected = true;
-        }
-      }),
-    );
-  };
+  }, [
+    selectAcitivitiesBySuggestion,
+    suggestionsController.allSuggestedBySem,
+    suggestionsController.currentSuggestionIdx,
+  ]);
 
   const handleChangeSemester = useCallback(
-    (newSem: Semester) => {
-      if (suggestions.all[newSem].length > 0) {
-        const suggestedSubjects = suggestions.all[newSem];
-        // set the first suggestion to subjects
-        selectAcitivitiesBySuggestion(suggestedSubjects[0]);
-        setSuggestions((prev) => ({
-          ...prev,
-          currentSuggestionIdx: 0,
-          hasNext: suggestedSubjects.length > 1,
-          hasPrev: false,
-        }));
+    (newSem: string) => {
+      const newSuggestionsBySem = suggestionsController.allSuggested.find(
+        (s) => s.semester === newSem,
+      );
+      if (!newSuggestionsBySem) {
+        return;
       }
+      const allBestCombo = newSuggestionsBySem.subjectCombinations.flatMap(
+        (sc) => sc.activityCombinations,
+      );
+
+      selectAcitivitiesBySuggestion(allBestCombo[0].activities);
+      setSuggestionsController((prev) => ({
+        ...prev,
+        currentSuggestionIdx: 0,
+        hasNext: allBestCombo.length > 1,
+        hasPrev: false,
+      }));
 
       setSemester(newSem);
     },
-    [suggestions.all],
+    [selectAcitivitiesBySuggestion, suggestionsController.allSuggested],
   );
 
   const ctxValues = useMemo(
     () => ({
       subjects,
       swappingActivity,
-      suggestions,
+      suggestionsController,
       preference,
       semester,
       onToggleActivity: handleToggleActivity,
@@ -253,6 +302,7 @@ export default function DashboardProvider({
       onSwapActivity: handleSwapActivity,
       onDeselectSubject: handleDeselectSubject,
       onRemoveSubject: handleRemoveSubject,
+      onAddSubject: handleAddSubject,
       onSuggest: handleSuggest,
       onNextSuggest: handleNextSuggest,
       onPrevSuggest: handlePrevSuggest,
@@ -260,9 +310,13 @@ export default function DashboardProvider({
       onChangeSemester: handleChangeSemester,
     }),
     [
+      handleAddSubject,
       handleChangeSemester,
+      handleDeselectActivity,
+      handleDeselectSubject,
       handleNextSuggest,
       handlePrevSuggest,
+      handleRemoveSubject,
       handleSuggest,
       handleSwapActivity,
       handleSwapClicked,
@@ -270,7 +324,7 @@ export default function DashboardProvider({
       preference,
       semester,
       subjects,
-      suggestions,
+      suggestionsController,
       swappingActivity,
     ],
   );
