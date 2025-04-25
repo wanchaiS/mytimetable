@@ -138,6 +138,9 @@ export default function DashboardProvider({
     (subject: SubjectType) => {
       setSubjects(
         produce((draft: SubjectType[]) => {
+          if (draft.length === 0) {
+            setSemester(subject.semester);
+          }
           draft.push(subject);
         }),
       );
