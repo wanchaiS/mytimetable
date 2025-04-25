@@ -1,8 +1,8 @@
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
-import { isOverlap } from "@/lib/dateHelpers";
+import { ActivityType } from "@/hooks/useSubjects";
+import { isActivityOverlap } from "@/lib/dateHelpers";
 import { use } from "react";
 import { Fragment } from "react/jsx-runtime";
-import { ActivityType } from "../../types";
 import Activity from "./activity/activity";
 
 interface DropzoneProps {
@@ -20,7 +20,7 @@ function getOverlapGroups(activities: ActivityType[]): OverlapGroupType[] {
 
   // sort activities
   const sorted = [...activities].sort(
-    (a, b) => a.startEndTime[0].getTime() - b.startEndTime[0].getTime(),
+    (a, b) => a.start_time_mins - b.start_time_mins,
   );
 
   for (let i = 0; i < sorted.length; i++) {
@@ -34,7 +34,7 @@ function getOverlapGroups(activities: ActivityType[]): OverlapGroupType[] {
       for (let i = 0; i < group.columns.length; i++) {
         const column = group.columns[i];
         const foundOverlap = column.some((ac) =>
-          isOverlap(ac.startEndTime, activity.startEndTime),
+          isActivityOverlap(ac, activity),
         );
         if (!foundOverlap) {
           column.push(activity);
@@ -74,7 +74,7 @@ function findGroup(
       const column = group.columns[j];
       for (let k = 0; k < column.length; k++) {
         const existedAc = column[k];
-        if (isOverlap(activity.startEndTime, existedAc.startEndTime)) {
+        if (isActivityOverlap(activity, existedAc)) {
           return group;
         }
       }

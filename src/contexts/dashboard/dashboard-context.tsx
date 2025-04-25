@@ -1,28 +1,31 @@
-import { SuggestionsPerSemType } from "@/lib/subjectPlanner";
-import { ActivityType, Preference, Semester, SubjectType } from "@/types";
+import { ActivityType, SubjectType } from "@/hooks/useSubjects";
+import { ActivityCombinationType, SuggestionsType } from "@/lib/subjectPlanner";
+import { Preference } from "@/types";
 import { createContext } from "react";
 
 type DashboardContextType = {
   subjects: SubjectType[];
   swappingActivity: ActivityType | undefined;
-  suggestions: SuggestionType;
+  suggestionsController: SuggestionControllerType;
   preference: Preference;
-  semester: Semester;
+  semester: string;
   onToggleActivity: (activity: ActivityType) => void;
   onDeselectActivity: (activity: ActivityType) => void;
   onSwapClicked: (activity: ActivityType) => void;
   onSwapActivity: (newActivity: ActivityType) => void;
   onDeselectSubject: (subject: SubjectType) => void;
+  onAddSubject: (subject: SubjectType) => void;
   onRemoveSubject: (subjectCode: string) => void;
   onSetPreference: (pref: Preference) => void;
   onSuggest: () => void;
   onNextSuggest: () => void;
   onPrevSuggest: () => void;
-  onChangeSemester: (semester: Semester) => void;
+  onChangeSemester: (semester: string) => void;
 };
 
-export type SuggestionType = {
-  all: SuggestionsPerSemType;
+export type SuggestionControllerType = {
+  allSuggestedBySem: ActivityCombinationType[];
+  allSuggested: SuggestionsType[];
   currentSuggestionIdx: number;
   hasNext: boolean;
   hasPrev: boolean;
@@ -31,8 +34,9 @@ export type SuggestionType = {
 export const DashboardContext = createContext<DashboardContextType>({
   subjects: [],
   swappingActivity: undefined,
-  suggestions: {
-    all: { Autumn: [], Spring: [], Summer: [] },
+  suggestionsController: {
+    allSuggestedBySem: [],
+    allSuggested: [],
     currentSuggestionIdx: 0,
     hasNext: false,
     hasPrev: false,
@@ -44,6 +48,7 @@ export const DashboardContext = createContext<DashboardContextType>({
   onSwapClicked: () => {},
   onSwapActivity: () => {},
   onDeselectSubject: () => {},
+  onAddSubject: () => {},
   onRemoveSubject: () => {},
   onSetPreference: () => {},
   onSuggest: () => {},
