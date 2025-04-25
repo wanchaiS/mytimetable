@@ -1,10 +1,10 @@
 import { DAY_ABBREVIATIONS } from "@/constants";
+import { Day } from "@/hooks/useSubjects";
 import { cn } from "@/lib/utils";
-import { Day } from "@/types";
 import React from "react";
 import { Badge } from "./badge";
 
-export function getShortDay(long: Day | undefined): string | undefined {
+function getShortDay(long: Day | undefined): string | undefined {
   return Object.keys(DAY_ABBREVIATIONS).find(
     (short) => DAY_ABBREVIATIONS[short] === long,
   );

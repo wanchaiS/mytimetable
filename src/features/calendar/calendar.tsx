@@ -78,7 +78,7 @@ export default function Calendar(): React.JSX.Element {
     currentWeek === 0
       ? selectedActivities
       : selectedActivities.filter((sa) =>
-          sa.dates.some((d) => days.some((day) => isSameDay(day, d))),
+          sa.dates.some((d) => days.some((day) => isSameDay(day, new Date(d)))),
         );
 
   useEffect(() => {
