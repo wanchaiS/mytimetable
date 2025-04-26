@@ -7,9 +7,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="bg-background min-h-svh">
+    <div className="relative flex min-h-svh w-full flex-col bg-(--background)">
       <Header />
-      <main>{children}</main>
+      <main className="h-full">{children}</main>
     </div>
   );
 }

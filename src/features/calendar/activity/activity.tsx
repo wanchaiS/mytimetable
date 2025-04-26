@@ -16,75 +16,57 @@ interface ActivityProps {
   activity: ActivityType;
   maxColumns: number;
   colNumber: number;
-  isOption: boolean;
   hasRemainingOptions: boolean;
 }
 
 function getHeight(activity: ActivityType): number {
   // get height from end time - start time
   const diffMinutes = activity.end_time_mins - activity.start_time_mins;
-  const height = (diffMinutes / 30) * 40;
+  const height = (diffMinutes / 30) * 64;
   return height;
 }
 
 function getTop(activity: ActivityType) {
-  // get top position from "how far is it from the 0:00AM"
-  const top = (activity.start_time_mins / 30) * 40;
+  // get top position from "how far is it from the 8:00AM"
+  const top = ((activity.start_time_mins - 480) / 30) * 64;
   return top;
 }
 
 function getWidth(intersectCount: number): number {
   if (intersectCount === 0) {
-    return 175;
+    return 180;
   }
-  return 175 / intersectCount;
-}
-
-function getBorder(type: string): string {
-  if (type.includes("Lec")) {
-    return "border border-l-10 border-[var(--type-lec)]";
-  }
-  if (type.includes("Cmp")) {
-    return "border border-l-10 border-[var(--type-cmp)]";
-  }
-  if (type.includes("Wrk")) {
-    return "border border-l-10 border-[var(--type-wrk)]";
-  }
-  if (type.includes("Tut")) {
-    return "border border-l-10 border-[var(--type-tut)]";
-  }
-  if (type.includes("Olr")) {
-    return "border border-l-10 border-[var(--type-olr)]";
-  }
-  if (type.includes("Lab")) {
-    return "bborder border-l-10 order-[var(--type-lab)]";
-  }
-  return "";
+  return 180 / intersectCount;
 }
 
 export default function Activity({
   activity,
   colNumber,
   maxColumns,
-  isOption,
   hasRemainingOptions,
 }: ActivityProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const {
+    subjects,
     swappingActivity,
+    swapping,
     onSwapActivity,
     onSwapClicked,
     onDeselectActivity,
+    onSelectActivity,
   } = use(DashboardContext);
-  const swapMode = swappingActivity !== undefined;
+
+  const subject = subjects.find((s) => s.code === activity.code);
   const isSwapOrigin = swappingActivity?.id === activity.id;
+  const isOption = !activity.selected;
+  const isSwapping = swapping && swappingActivity;
 
   const height = getHeight(activity);
   const top = getTop(activity);
   const width = getWidth(maxColumns);
   const left = width * colNumber;
 
-  if (isOption && swapMode) {
+  if (isOption && swapping) {
     return (
       <div
         className="absolute pr-2 pb-1"
@@ -97,7 +79,9 @@ export default function Activity({
       >
         <AnimateBoarderContainer>
           <div
-            onClick={() => onSwapActivity(activity)}
+            onClick={() =>
+              isSwapping ? onSwapActivity(activity) : onSelectActivity(activity)
+            }
             className={cn(
               "group bg-background relative flex h-full rounded-sm p-1 hover:brightness-90",
             )}
@@ -113,7 +97,7 @@ export default function Activity({
   }
 
   return (
-    <Popover open={open && !swapMode} onOpenChange={setOpen}>
+    <Popover open={open && !swapping} onOpenChange={setOpen}>
       <PopoverTrigger
         asChild
         onMouseEnter={() => setOpen(true)}
@@ -122,7 +106,7 @@ export default function Activity({
         <div
           className={cn(
             "absolute pr-2 pb-1 hover:brightness-75",
-            `${swapMode ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
+            `${swapping ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
           )}
           style={{
             top: `${top}px`,
@@ -132,15 +116,17 @@ export default function Activity({
           }}
         >
           <div
-            className={cn(
-              "bg-background flex h-full rounded-sm p-1",
-              getBorder(activity.type),
-            )}
+            style={{ borderColor: activity.color }}
+            className="bg-background flex h-full rounded-sm border border-l-10 p-1"
           >
             <div className="flex w-full flex-col space-y-2">
-              <div className="truncate-text h-full overflow-hidden text-sm text-ellipsis">
-                {activity.name}
+              <div className="flex flex-1 flex-col">
+                <div className="truncate-text overflow-hidden text-sm text-ellipsis">
+                  {subject?.callista_code}
+                </div>
+                <div className="text-xs">{subject?.name}</div>
               </div>
+
               {maxColumns <= 2 && (
                 <div
                   className={`"flex space-x-1 ${activity.duration <= 1 ? "flex-col" : ""}"`}
@@ -151,7 +137,7 @@ export default function Activity({
               )}
             </div>
           </div>
-          {swapMode && isSwapOrigin && (
+          {swapping && isSwapOrigin && (
             <div
               className="absolute pr-2 pb-1"
               style={{
@@ -189,22 +175,22 @@ export default function Activity({
         )}
         <div
           onClick={() =>
-            !swapMode && hasRemainingOptions && onSwapClicked(activity)
+            !swapping && hasRemainingOptions && onSwapClicked(activity)
           }
           className={cn(
             "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
             {
-              "cursor-not-allowed opacity-50": swapMode || !hasRemainingOptions,
+              "cursor-not-allowed opacity-50": swapping || !hasRemainingOptions,
             },
           )}
         >
           <ArrowLeftRight color="#4ca03b" size={14} /> <span>Swap</span>
         </div>
         <div
-          onClick={() => !swapMode && onDeselectActivity(activity)}
+          onClick={() => !swapping && onDeselectActivity(activity)}
           className={cn(
             "hover:bg-accent flex cursor-pointer items-center space-x-1 text-sm",
-            { "cursor-not-allowed opacity-50": swapMode },
+            { "cursor-not-allowed opacity-50": swapping },
           )}
         >
           <CalendarX2 color="#a03b3b" size={14} />

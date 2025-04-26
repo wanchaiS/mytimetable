@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
 import useSubjects from "@/hooks/useSubjects";
-import { CirclePlus, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { use, useState } from "react";
 import SearchInput from "./search-input/search-input";
 
@@ -43,6 +43,7 @@ export default function SearchSubjects() {
                   subjects.findIndex((s) => s.code === subject.code) !== -1
                 }
                 className="h-8 w-8 cursor-pointer items-center rounded-full"
+                size="icon"
                 onClick={() => onAddSubject(subject)}
               >
                 <Plus size={16} />
@@ -56,8 +57,8 @@ export default function SearchSubjects() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
-          <CirclePlus fill="#84cc16" size={16} />
+        <Button size={"icon"} className="cursor-pointer rounded-full">
+          <Plus />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-3xl">

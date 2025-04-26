@@ -1,4 +1,3 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardProvider from "@/contexts/dashboard/dashboard-provider";
 import Calendar from "@/features/calendar/calendar";
 import SubjectsPane from "@/features/subjects-pane/subjects-pane";
@@ -6,12 +5,10 @@ import SubjectsPane from "@/features/subjects-pane/subjects-pane";
 export default function Main() {
   return (
     <DashboardProvider>
-      <SidebarProvider>
+      <div className="flex h-full">
         <SubjectsPane />
-        <SidebarTrigger />
-
         <Calendar />
-      </SidebarProvider>
+      </div>
     </DashboardProvider>
   );
 }

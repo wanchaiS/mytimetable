@@ -1,30 +1,22 @@
 import { ActivityType } from "@/hooks/useSubjects";
 
-/**
- * Checks if two activities overlap based on their start and end times.
- *
- * @param activity1Date - A tuple containing the start and end Date objects for the first activity.
- * @param activity2Date - A tuple containing the start and end Date objects for the second activity.
- * @returns A boolean indicating whether the two activities overlap.
- */
 export function isActivityOverlap(
   activity1: ActivityType,
   activity2: ActivityType,
 ): boolean {
+  // Check if one activity ends exactly when the other starts (back-to-back)
   if (
-    activity2.start_time_mins >= activity1.start_time_mins &&
-    activity2.start_time_mins < activity1.end_time_mins
+    activity1.end_time_mins === activity2.start_time_mins ||
+    activity2.end_time_mins === activity1.start_time_mins
   ) {
-    return true;
+    return false;
   }
 
-  // if subject2 ends between duration of subject1
-  if (
-    activity2.end_time_mins > activity1.start_time_mins &&
-    activity2.end_time_mins <= activity1.end_time_mins
-  ) {
-    return true;
-  }
+  // Activities collide if one starts before the other ends
+  return (
+    activity1.start_time_mins < activity2.end_time_mins &&
+    activity2.start_time_mins < activity1.end_time_mins
+  );
   return false;
 }
 
@@ -58,4 +50,19 @@ export function compareTime(totalMinsA: number, totalMinsB: number): number {
   if (totalMinsA > totalMinsB) return 1;
 
   return 0;
+}
+
+export function minsToAMPM(totalMinutes: number) {
+  if (totalMinutes < 0 || !Number.isInteger(totalMinutes)) {
+    return null;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const ampm = hours < 12 ? "AM" : "PM";
+  const twelveHourFormat = hours % 12 === 0 ? 12 : hours % 12;
+
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
+  return `${twelveHourFormat}:${formattedMinutes} ${ampm}`;
 }

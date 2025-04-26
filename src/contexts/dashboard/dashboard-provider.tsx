@@ -46,12 +46,17 @@ export default function DashboardProvider({
     "subjects",
     [],
   );
-  console.log("subjects", subjects);
+
   const [semester, setSemester] = useState(getFirstSem(subjects));
 
   const [swappingActivity, setSwappingActivity] = useState<
     ActivityType | undefined
   >();
+
+  const [selectingActivityTypeCode, setSelectingActivityTypeCode] = useState<
+    string | undefined
+  >();
+  const [swapping, setSwapping] = useState(false);
 
   const [suggestionsController, setSuggestionsController] =
     useState<SuggestionControllerType>({
@@ -62,11 +67,31 @@ export default function DashboardProvider({
       hasPrev: false,
     });
 
-  console.log("suggestionsController", suggestionsController);
-
   const [preference, setPreference] = useState<Preference>("Late");
 
-  const handleToggleActivity = useCallback(
+  const handleClearSelected = useCallback(() => {
+    setSubjects(
+      produce((draft: SubjectType[]) => {
+        draft.forEach((subject) => {
+          subject.activities.forEach((ac) => (ac.selected = false));
+        });
+      }),
+    );
+    setSuggestionsController({
+      allSuggestedBySem: [],
+      allSuggested: [],
+      currentSuggestionIdx: 0,
+      hasNext: false,
+      hasPrev: false,
+    });
+  }, [setSubjects]);
+
+  const handleSelectActivityByType = useCallback((typeCode: string) => {
+    setSelectingActivityTypeCode(typeCode);
+    setSwapping(true);
+  }, []);
+
+  const handleSelectActivity = useCallback(
     (activity: ActivityType) => {
       setSubjects(
         produce((draft: SubjectType[]) => {
@@ -83,6 +108,8 @@ export default function DashboardProvider({
           });
         }),
       );
+      setSwapping(false);
+      setSelectingActivityTypeCode(undefined);
     },
     [setSubjects],
   );
@@ -100,20 +127,27 @@ export default function DashboardProvider({
     [setSubjects],
   );
 
-  const handleSwapClicked = useCallback((swappingOut: ActivityType) => {
-    setSwappingActivity(swappingOut);
-  }, []);
+  const handleSwapClicked = useCallback(
+    (swappingOut: ActivityType | undefined) => {
+      if (swappingOut) {
+        setSwappingActivity(swappingOut);
+      }
+      setSwapping(true);
+    },
+    [],
+  );
 
   const handleSwapActivity = useCallback(
     (swappingIn: ActivityType) => {
       if (swappingActivity === undefined) {
         return;
       }
-      handleToggleActivity(swappingIn);
+      handleSelectActivity(swappingIn);
 
       setSwappingActivity(undefined);
+      setSwapping(false);
     },
-    [handleToggleActivity, swappingActivity],
+    [handleSelectActivity, swappingActivity],
   );
 
   const handleDeselectSubject = useCallback(
@@ -171,6 +205,7 @@ export default function DashboardProvider({
             const subject = draft[i];
             for (let j = 0; j < subject.activities.length; j++) {
               const activity = subject.activities[j];
+
               if (!suggestion.find((s) => s.id === activity.id)) {
                 activity.selected = false;
               } else {
@@ -200,7 +235,6 @@ export default function DashboardProvider({
     );
 
     // set the first suggestion to subjects
-    console.log("allBestCombo[0].activities", allBestCombo[0].activities);
     selectAcitivitiesBySuggestion(allBestCombo[0].activities);
     setSuggestionsController({
       allSuggestedBySem: allBestCombo,
@@ -222,7 +256,6 @@ export default function DashboardProvider({
     ) {
       return;
     }
-
     selectAcitivitiesBySuggestion(
       suggestionsController.allSuggestedBySem[
         suggestionsController.currentSuggestionIdx + 1
@@ -296,10 +329,13 @@ export default function DashboardProvider({
     () => ({
       subjects,
       swappingActivity,
+      selectingActivityTypeCode,
+      swapping,
       suggestionsController,
       preference,
       semester,
-      onToggleActivity: handleToggleActivity,
+      onSelectActivityByType: handleSelectActivityByType,
+      onSelectActivity: handleSelectActivity,
       onDeselectActivity: handleDeselectActivity,
       onSwapClicked: handleSwapClicked,
       onSwapActivity: handleSwapActivity,
@@ -311,10 +347,13 @@ export default function DashboardProvider({
       onPrevSuggest: handlePrevSuggest,
       onSetPreference: (pref: Preference) => setPreference(pref),
       onChangeSemester: handleChangeSemester,
+      onClearSelected: handleClearSelected,
     }),
     [
+      handleSelectActivityByType,
       handleAddSubject,
       handleChangeSemester,
+      handleSelectActivity,
       handleDeselectActivity,
       handleDeselectSubject,
       handleNextSuggest,
@@ -323,12 +362,14 @@ export default function DashboardProvider({
       handleSuggest,
       handleSwapActivity,
       handleSwapClicked,
-      handleToggleActivity,
+      handleClearSelected,
       preference,
       semester,
       subjects,
       suggestionsController,
       swappingActivity,
+      swapping,
+      selectingActivityTypeCode,
     ],
   );
 
