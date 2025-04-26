@@ -5,13 +5,16 @@ import { createContext } from "react";
 
 type DashboardContextType = {
   subjects: SubjectType[];
+  swapping: boolean;
   swappingActivity: ActivityType | undefined;
+  selectingActivityTypeCode: string | undefined;
   suggestionsController: SuggestionControllerType;
   preference: Preference;
-  semester: string;
-  onToggleActivity: (activity: ActivityType) => void;
+  semester: string | undefined;
+  onSelectActivityByType: (subject: string) => void;
+  onSelectActivity: (activity: ActivityType) => void;
   onDeselectActivity: (activity: ActivityType) => void;
-  onSwapClicked: (activity: ActivityType) => void;
+  onSwapClicked: (activity: ActivityType | undefined) => void;
   onSwapActivity: (newActivity: ActivityType) => void;
   onDeselectSubject: (subject: SubjectType) => void;
   onAddSubject: (subject: SubjectType) => void;
@@ -21,6 +24,7 @@ type DashboardContextType = {
   onNextSuggest: () => void;
   onPrevSuggest: () => void;
   onChangeSemester: (semester: string) => void;
+  onClearSelected: () => void;
 };
 
 export type SuggestionControllerType = {
@@ -33,6 +37,8 @@ export type SuggestionControllerType = {
 
 export const DashboardContext = createContext<DashboardContextType>({
   subjects: [],
+  swapping: false,
+  selectingActivityTypeCode: undefined,
   swappingActivity: undefined,
   suggestionsController: {
     allSuggestedBySem: [],
@@ -43,7 +49,8 @@ export const DashboardContext = createContext<DashboardContextType>({
   },
   preference: "Late",
   semester: "Autumn",
-  onToggleActivity: () => {},
+  onSelectActivityByType: () => {},
+  onSelectActivity: () => {},
   onDeselectActivity: () => {},
   onSwapClicked: () => {},
   onSwapActivity: () => {},
@@ -55,4 +62,5 @@ export const DashboardContext = createContext<DashboardContextType>({
   onNextSuggest: () => {},
   onPrevSuggest: () => {},
   onChangeSemester: () => {},
+  onClearSelected: () => {},
 });

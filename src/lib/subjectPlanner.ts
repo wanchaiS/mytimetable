@@ -35,6 +35,10 @@ export function suggest(
       suggestion.subjects,
       24,
     );
+    console.log(
+      "suggestion.subjectCombinations",
+      suggestion.subjectCombinations,
+    );
 
     for (let j = 0; j < suggestion.subjectCombinations.length; j++) {
       // activity with the same "type" on the same subject should not be in the same combination
@@ -45,7 +49,10 @@ export function suggest(
 
       suggestion.subjectCombinations[j].activityCombinations =
         buildActivityCombinations(Object.entries(groupedActivities), 0);
-
+      console.log(
+        "suggestion.subjectCombinations[j].activityCombinations",
+        suggestion.subjectCombinations[j].activityCombinations,
+      );
       // calculate score for each activity combination
       suggestion.subjectCombinations[j].activityCombinations.forEach(
         (activityCombination) => {

@@ -1,14 +1,11 @@
-import ActivityBadge from "@/components/ui/activitybadge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import DayBadge from "@/components/ui/daybadge";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -21,183 +18,171 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import TimeBadge from "@/components/ui/timebadge";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
-import { Day } from "@/hooks/useSubjects";
-import { Preference } from "@/types";
-import {
-  ArrowBigLeft,
-  ArrowBigRight,
-  ChevronRight,
-  Filter,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
-import React, { use, useState } from "react";
+import { ActivityType } from "@/hooks/useSubjects";
+import { minsToAMPM } from "@/lib/dateHelpers";
+import { cn } from "@/lib/utils";
+import { ChevronRight, X } from "lucide-react";
+import React, { use } from "react";
 import SearchSubjects from "./search-subjects/search-subjects";
 
 export default function SubjectsPane(): React.JSX.Element {
-  const [filterDays] = useState<Day[]>([]);
-
   const {
+    swapping,
     subjects,
-    suggestionsController,
-    preference,
     semester,
-    onToggleActivity,
-    onSuggest,
-    onNextSuggest,
-    onPrevSuggest,
+    suggestionsController,
     onRemoveSubject,
-    onSetPreference,
+    onSwapClicked,
+    onSelectActivityByType,
     onChangeSemester,
   } = use(DashboardContext);
   const semSubjects = subjects.filter((s) => s.semester === semester);
-  const searchedSubjects =
-    filterDays.length > 0
-      ? semSubjects
-          .map((sub) => ({
-            ...sub,
-            activities: sub.activities.filter(
-              (ac) => ac.day && filterDays.includes(ac.day),
-            ),
-          }))
-          .filter((sub) => sub.activities.length > 0)
-      : semSubjects;
 
   return (
-    <Sidebar className="top-[40px]">
+    <Sidebar className="top-(--header-height) !h-[calc(100svh-var(--header-height))] border-(--border)">
       {/**Header section suggestions */}
-      <SidebarHeader>
-        <div className="flex items-center space-x-2">
-          <RadioGroup
-            value={preference}
-            onValueChange={(value: Preference) => onSetPreference(value)}
+      <SidebarHeader className="border-b border-(--border) px-4 py-4">
+        <div className="flex space-x-2">
+          <Label className="text-md font-bold">Semester</Label>
+          <Select
+            value={semester}
+            onValueChange={(sem) => onChangeSemester(sem)}
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Late" />
-              <Label>Late</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Morning" />
-              <Label>Morning</Label>
-            </div>
-          </RadioGroup>
-          <Button className="ml-4" variant="outline" onClick={onSuggest}>
-            <Sparkles /> <span>Suggest</span>
-          </Button>
-          <div>
-            Suggestion:{" "}
-            {suggestionsController.allSuggestedBySem.length > 0
-              ? suggestionsController.currentSuggestionIdx + 1
-              : 0}
-            /{suggestionsController.allSuggestedBySem.length}
-          </div>
+            <SelectTrigger className="w-[100px]">
+              <SelectValue placeholder="Select semester" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="Autumn">Autumn</SelectItem>
+                <SelectItem value="Spring">Spring</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
-
-        <Button
-          onClick={onPrevSuggest}
-          disabled={!suggestionsController.hasPrev}
-        >
-          <ArrowBigLeft /> <span>Prev</span>
-        </Button>
-        <Button
-          onClick={onNextSuggest}
-          disabled={!suggestionsController.hasNext}
-        >
-          <ArrowBigRight /> <span>Next</span>
-        </Button>
+        <div className="flex justify-between">
+          <Label className="text-md font-bold"> Subjects</Label>
+          {/** Add subjects */}
+          <SearchSubjects />
+        </div>
       </SidebarHeader>
 
-      {/** Body where the subjects are */}
-      <SidebarContent>
-        <SidebarGroup className="border-t-1">
-          <div className="flex items-center">
-            <SidebarGroupLabel className="flex-1">Subjects</SidebarGroupLabel>
-            <Select
-              value={semester}
-              onValueChange={(sem) => onChangeSemester(sem)}
+      {/** Body */}
+      <SidebarContent className="p-4">
+        {semSubjects.map((subject) => (
+          <Collapsible key={subject.code} className="group/subject">
+            <Card
+              style={{ borderColor: subject.color }}
+              className={cn(
+                "gap-3 border border-l-10 py-2 pl-2",
+                suggestionsController.allSuggestedBySem.length > 0 &&
+                  !subject.activities.some((ac) => ac.selected)
+                  ? "bg-(--muted-foreground)"
+                  : "",
+              )}
             >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select semester" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="Autumn">Autumn</SelectItem>
-                  <SelectItem value="Spring">Spring</SelectItem>
-                  <SelectItem value="Summer">Summer</SelectItem>
-                  <SelectItem value="N/A">N/A</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Button className="mr-2" variant="outline" size="icon">
-              <Filter size={16} />
-            </Button>
-            {/** Search dialog */}
-            <SearchSubjects />
-          </div>
-          <SidebarMenu>
-            {searchedSubjects.map((subject) => (
-              <Collapsible key={subject.code} className="group/subject">
-                <SidebarMenuItem>
+              <CardHeader className="p-2">
+                <div className="flex items-center">
+                  <div className="flex-1 text-sm">{subject.callista_code}</div>
+                  <X
+                    size={18}
+                    color="var(--destructive)"
+                    className="invisible ml-auto cursor-pointer group-hover/subject:visible"
+                    onClick={() => onRemoveSubject(subject.code)}
+                  />
+                </div>
+
+                <div className="flex">
+                  <div className="flex-1 text-xs">{subject.name}</div>
+
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={subject.name} className="">
-                      <ChevronRight className="transition-transform duration-200 group-data-[state=open]/subject:rotate-90" />
-                      <span className="truncate" title={subject.name}>
-                        {subject.name}
-                      </span>
-                      <Trash2
-                        color="#ef4444"
-                        className="invisible ml-auto group-hover/subject:visible"
-                        onClick={() => onRemoveSubject(subject.code)}
-                      />
-                    </SidebarMenuButton>
+                    <ChevronRight className="mt-[-4px] cursor-pointer transition-transform duration-200 group-data-[state=open]/subject:rotate-90" />
                   </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub className="mr-0 pr-0">
-                      {subject.activities.map((activity) => (
-                        <SidebarMenuSubItem key={activity.id}>
-                          <SidebarMenuSubButton
-                            className="cursor-pointer"
-                            onClick={() => onToggleActivity(activity)}
-                          >
-                            <ActivityBadge type={activity.type} />
-                            <Badge
-                              variant="outline"
-                              className={activity.selected ? "bg-lime-500" : ""}
-                            >
-                              {activity.activity}
-                            </Badge>
-                            <DayBadge
-                              day={activity.day}
-                              selected={activity.selected}
-                            />
-                            <TimeBadge
-                              selected={activity.selected}
-                              startTime={activity.start_time}
-                            />
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+                </div>
+              </CardHeader>
+              <CollapsibleContent className="space-y-2 pr-4 pl-2">
+                {getActivityTypes(subject.activities).map((activityType) => {
+                  const selectedActivity = subject.activities.find(
+                    (a) => a.type === activityType.type && a.selected,
+                  );
+
+                  return (
+                    <div
+                      key={activityType.type}
+                      className="flex justify-between bg-(--card-activity) p-2 text-sm"
+                    >
+                      <div title={activityType.type_desc}>
+                        {activityType.type}
+                      </div>
+                      {selectedActivity ? (
+                        <div>{getStartEndTimeFormatted(selectedActivity)}</div>
+                      ) : (
+                        <div>{""}</div>
+                      )}
+                      {selectedActivity ? (
+                        <Button
+                          size={"sm"}
+                          disabled={
+                            swapping ||
+                            subject.activities.filter(
+                              (a) => a.type === activityType.type,
+                            ).length < 2
+                          }
+                          variant="ghost"
+                          className="h-fit cursor-pointer"
+                          onClick={() => onSwapClicked(selectedActivity)}
+                        >
+                          Change
+                        </Button>
+                      ) : (
+                        <Button
+                          size={"sm"}
+                          disabled={swapping}
+                          variant="ghost"
+                          className="h-fit cursor-pointer"
+                          onClick={() =>
+                            onSelectActivityByType(
+                              `${subject.code}|${activityType.type}`,
+                            )
+                          }
+                        >
+                          Select
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        ))}
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>
   );
+}
+
+type ActivityCode = { type: string; type_desc: string };
+function getActivityTypes(activities: ActivityType[]): ActivityCode[] {
+  const result: ActivityCode[] = [];
+  for (let i = 0; i < activities.length; i++) {
+    const activity = activities[i];
+    if (result.find((r) => r.type === activity.type)) {
+      continue;
+    }
+    result.push({ type: activity.type, type_desc: activity.type_desc });
+  }
+  return result;
+}
+
+function getStartEndTimeFormatted(activity: ActivityType): string {
+  const start = minsToAMPM(activity.start_time_mins);
+  const end = minsToAMPM(activity.end_time_mins);
+  if (start === null || end === null) {
+    return "Invalid date";
+  }
+  return `${start} - ${end}`;
 }

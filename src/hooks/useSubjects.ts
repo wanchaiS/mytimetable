@@ -9,8 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 
 export interface SubjectType {
   code: string;
+  callista_code: string;
   name: string;
   semester: string;
+  color: string;
   activities: ActivityType[];
 }
 
@@ -18,6 +20,7 @@ export interface ActivityType {
   code: string;
   name: string;
   type: string;
+  type_desc: string;
   activity: string;
   day: Day | undefined;
   room: string;
@@ -30,6 +33,7 @@ export interface ActivityType {
   selected: boolean;
   codeType: string;
   semester: string;
+  color: string;
 }
 
 export type Day =
@@ -70,14 +74,18 @@ function parseSubjectsResponse(
 }
 
 function parseSubjectResponse(subjectReponse: SubjectResponse): SubjectType {
+  const color = getRandomHexColor();
   return {
     name: subjectReponse.description,
     code: subjectReponse.subject_code,
-    semester: subjectReponse.semester,
+    callista_code: subjectReponse.callista_code,
+    semester: tryParseSemester(subjectReponse.semester),
+    color,
     activities: Object.keys(subjectReponse.activities).map((activityKey) =>
       parseActivityResponse(
         subjectReponse.activities[activityKey],
         subjectReponse,
+        color,
       ),
     ),
   };
@@ -86,6 +94,7 @@ function parseSubjectResponse(subjectReponse: SubjectResponse): SubjectType {
 function parseActivityResponse(
   activityResponse: ActivityResponse,
   subjectResponse: SubjectResponse,
+  color: string,
 ): ActivityType {
   const activityDates = parseDates(activityResponse.activitiesDays);
   const duration = Number(activityResponse.duration);
@@ -98,7 +107,9 @@ function parseActivityResponse(
     id: `${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.activity_code}`,
     name: subjectResponse.description,
     code: activityResponse.subject_code,
+    color,
     type: activityResponse.activity_group_code,
+    type_desc: activityResponse.activity_type,
     activity: activityResponse.activity_code,
     room: activityResponse.location,
     duration,
@@ -109,10 +120,21 @@ function parseActivityResponse(
     dates: activityDates,
     selected: false,
     codeType: `${activityResponse.subject_code}|${activityResponse.activity_group_code}`,
-    semester: activityResponse.semester,
+    semester: tryParseSemester(activityResponse.semester),
   };
 
   return activity;
+}
+
+function tryParseSemester(sem: string) {
+  switch (sem) {
+    case "SPR":
+      return "Spring";
+    case "AUT":
+      return "Autumn";
+    default:
+      return "Other";
+  }
 }
 
 function parseDates(dates: string[]): string[] {
@@ -156,6 +178,22 @@ function getStartEndTimeInMins(
   const endMinutes = startMinutes + duration;
 
   return [startMinutes, endMinutes];
+}
+
+function getRandomHexColor() {
+  // Generate a random number between 0 and 16777215 (hex FFFFFF)
+  const randomNumber = Math.floor(Math.random() * 16777215);
+
+  // Convert the number to a hexadecimal string and pad with zeros if needed
+  let hexColor = randomNumber.toString(16);
+
+  // Ensure the hex color is 6 digits by padding with zeros
+  while (hexColor.length < 6) {
+    hexColor = "0" + hexColor;
+  }
+
+  // Return the hex color with a '#' prefix
+  return "#" + hexColor;
 }
 
 export default useSubjects;

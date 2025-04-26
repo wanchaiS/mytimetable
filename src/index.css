@@ -29,8 +29,9 @@
   --chart-3: hsl(197 37% 24%);
   --chart-4: hsl(43 74% 66%);
   --chart-5: hsl(27 87% 67%);
+  --card-activity: hsl(0 0% 85.1%);
   --radius: 0.6rem;
-  --header-height: 40px;
+  --header-height: 60px;
 
   /* custom variables */
   --type-lec: hsl(225, 100%, 80%);

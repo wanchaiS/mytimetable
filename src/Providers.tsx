@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Outlet } from "react-router";
 import Layout from "./components/layouts/Layout";
+import { SidebarProvider } from "./components/ui/sidebar";
 
 const queryClient = new QueryClient();
 
@@ -20,9 +21,11 @@ export function Providers() {
     >
       <ErrorBoundary FallbackComponent={MainErrorFallback}>
         <QueryClientProvider client={queryClient}>
-          <Layout>
-            <Outlet />
-          </Layout>
+          <SidebarProvider>
+            <Layout>
+              <Outlet />
+            </Layout>
+          </SidebarProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </ErrorBoundary>
