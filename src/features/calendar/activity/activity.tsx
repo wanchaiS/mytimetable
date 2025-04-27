@@ -121,10 +121,8 @@ export default function Activity({
           >
             <div className="flex w-full flex-col space-y-2">
               <div className="flex flex-1 flex-col">
-                <div className="truncate-text overflow-hidden text-sm text-ellipsis">
-                  {subject?.callista_code}
-                </div>
-                <div className="text-xs">{subject?.name}</div>
+                <div className="text-sm">{subject?.callista_code}</div>
+                <div className="flex-1 text-xs">{subject?.name}</div>
               </div>
 
               {maxColumns <= 2 && (
