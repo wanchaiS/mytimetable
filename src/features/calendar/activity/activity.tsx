@@ -7,7 +7,6 @@ import React, { use, useState } from "react";
 import { cn } from "../../../lib/utils";
 
 import AnimateBoarderContainer from "@/components/animateBorderContainer/AnimateBoarderContainer";
-import { Button } from "@/components/ui/button";
 import { DashboardContext } from "@/contexts/dashboard/dashboard-context";
 import { ActivityType } from "@/hooks/useSubjects";
 import "./style.css";
@@ -19,24 +18,13 @@ interface ActivityProps {
   hasRemainingOptions: boolean;
 }
 
-function getHeight(activity: ActivityType): number {
-  // get height from end time - start time
-  const diffMinutes = activity.end_time_mins - activity.start_time_mins;
-  const height = (diffMinutes / 30) * 64;
-  return height;
-}
-
 function getTop(activity: ActivityType) {
-  // get top position from "how far is it from the 8:00AM"
-  const top = ((activity.start_time_mins - 480) / 30) * 64;
-  return top;
+  const topPct = ((activity.start_time_mins - 480) / 960) * 100;
+  return topPct;
 }
-
-function getWidth(intersectCount: number): number {
-  if (intersectCount === 0) {
-    return 180;
-  }
-  return 180 / intersectCount;
+function getBottom(activity: ActivityType) {
+  const bottomPct = 100 - ((activity.end_time_mins - 480) / 960) * 100;
+  return bottomPct;
 }
 
 export default function Activity({
@@ -61,20 +49,22 @@ export default function Activity({
   const isOption = !activity.selected;
   const isSwapping = swapping && swappingActivity;
 
-  const height = getHeight(activity);
+  const width = 100 / maxColumns;
   const top = getTop(activity);
-  const width = getWidth(maxColumns);
+  const bottom = getBottom(activity);
   const left = width * colNumber;
+  const colSpan = colNumber === maxColumns - 1 ? 0 : colNumber + 1;
+  const right = width * colSpan;
 
   if (isOption && swapping) {
     return (
       <div
         className="absolute pr-2 pb-1"
         style={{
-          top: `${top}px`,
-          left: `${left}px`,
-          width: `${width}px`,
-          height: `${height}px`,
+          top: `${top}%`,
+          left: `${left}%`,
+          bottom: `${bottom}%`,
+          right: `${right}%`,
         }}
       >
         <AnimateBoarderContainer>
@@ -109,10 +99,10 @@ export default function Activity({
             `${swapping ? (isSwapOrigin ? "" : "brightness-75") : ""}`,
           )}
           style={{
-            top: `${top}px`,
-            left: `${left}px`,
-            width: `${width}px`,
-            height: `${height}px`,
+            top: `${top}%`,
+            left: `${left}%`,
+            bottom: `${bottom}%`,
+            right: `${right}%`,
           }}
         >
           <div
@@ -122,7 +112,7 @@ export default function Activity({
             <div className="flex w-full flex-col space-y-2">
               <div className="flex flex-1 flex-col">
                 <div className="text-sm">{subject?.callista_code}</div>
-                <div className="flex-1 text-xs">{subject?.name}</div>
+                <div className="flex-1 text-xs break-all">{subject?.name}</div>
               </div>
 
               {maxColumns <= 2 && (
@@ -135,28 +125,6 @@ export default function Activity({
               )}
             </div>
           </div>
-          {swapping && isSwapOrigin && (
-            <div
-              className="absolute pr-2 pb-1"
-              style={{
-                top: "0px",
-                left: `${left}px`,
-                width: `${width}px`,
-                height: `${height}px`,
-              }}
-            >
-              <div className="animated-border h-full rounded-sm p-0.5">
-                <div className="hover:bg-secondary flex h-full w-full items-center justify-center opacity-0 hover:opacity-70">
-                  <Button
-                    onClick={() => onSwapActivity(activity)}
-                    className="h-full w-full cursor-pointer"
-                  >
-                    Select
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </PopoverTrigger>
       <PopoverContent

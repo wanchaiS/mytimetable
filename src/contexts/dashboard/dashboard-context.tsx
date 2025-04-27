@@ -25,6 +25,7 @@ type DashboardContextType = {
   onPrevSuggest: () => void;
   onChangeSemester: (semester: string) => void;
   onClearSelected: () => void;
+  onAbortSwapping: () => void;
 };
 
 export type SuggestionControllerType = {
@@ -63,4 +64,5 @@ export const DashboardContext = createContext<DashboardContextType>({
   onPrevSuggest: () => {},
   onChangeSemester: () => {},
   onClearSelected: () => {},
+  onAbortSwapping: () => {},
 });

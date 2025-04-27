@@ -150,6 +150,12 @@ export default function DashboardProvider({
     [handleSelectActivity, swappingActivity],
   );
 
+  const handleAbortSwapping = useCallback(() => {
+    setSwapping(false);
+    setSwappingActivity(undefined);
+    setSelectingActivityTypeCode(undefined);
+  }, []);
+
   const handleDeselectSubject = useCallback(
     (subject: SubjectType) => {
       setSubjects(
@@ -348,6 +354,7 @@ export default function DashboardProvider({
       onSetPreference: (pref: Preference) => setPreference(pref),
       onChangeSemester: handleChangeSemester,
       onClearSelected: handleClearSelected,
+      onAbortSwapping: handleAbortSwapping,
     }),
     [
       handleSelectActivityByType,
@@ -363,6 +370,7 @@ export default function DashboardProvider({
       handleSwapActivity,
       handleSwapClicked,
       handleClearSelected,
+      handleAbortSwapping,
       preference,
       semester,
       subjects,
