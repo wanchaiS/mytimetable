@@ -53,7 +53,9 @@ export default function Activity({
   const top = getTop(activity);
   const bottom = getBottom(activity);
   const left = width * colNumber;
-  const colSpan = colNumber === maxColumns - 1 ? 0 : colNumber + 1;
+  // where does the right edge of the column ends
+  const colSpan =
+    colNumber === maxColumns - 1 ? 0 : maxColumns - (colNumber + 1);
   const right = width * colSpan;
 
   if (isOption && swapping) {
