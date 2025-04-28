@@ -308,6 +308,8 @@ export default function DashboardProvider({
 
   const handleChangeSemester = useCallback(
     (newSem: string) => {
+      setSemester(newSem);
+
       const newSuggestionsBySem = suggestionsController.allSuggested.find(
         (s) => s.semester === newSem,
       );
@@ -325,8 +327,6 @@ export default function DashboardProvider({
         hasNext: allBestCombo.length > 1,
         hasPrev: false,
       }));
-
-      setSemester(newSem);
     },
     [selectAcitivitiesBySuggestion, suggestionsController.allSuggested],
   );
