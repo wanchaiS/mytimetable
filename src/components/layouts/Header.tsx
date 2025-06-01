@@ -1,13 +1,22 @@
-import { SidebarTrigger } from "../ui/sidebar";
+import { UserProfile } from "../ui/user-profile";
 
 export default function Header() {
-  return (
-    <header className="flex h-15 items-center border-b border-(--border) bg-(--background) pr-10 pl-5">
-      <SidebarTrigger />
+  const handleLogout = () => {
+    // TODO: Implement logout logic
+    console.log("Logout clicked");
+  };
 
-      <div className="ml-8 text-3xl font-bold text-(--primary)">
-        Timetable<span className="text-blue-500">X</span>
+  return (
+    <header className="flex h-15 items-center justify-between border-b border-(--border) bg-(--background) px-4">
+      <div className="flex items-center">
+        {/* <Button variant="ghost" size="icon">
+          <Menu />
+        </Button> */}
+        <div className="ml-2 text-2xl font-bold text-(--primary)">
+          Timetable<span className="text-blue-500">X</span>
+        </div>
       </div>
+      <UserProfile onLogout={handleLogout} />
     </header>
   );
 }

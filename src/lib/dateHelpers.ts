@@ -1,4 +1,4 @@
-import { ActivityType } from "@/hooks/useSubjects";
+import { ActivityType } from "@/hooks/useSearchSubjects";
 
 export function isActivityOverlap(
   activity1: ActivityType,
@@ -52,17 +52,29 @@ export function compareTime(totalMinsA: number, totalMinsB: number): number {
   return 0;
 }
 
-export function minsToAMPM(totalMinutes: number) {
+export function minsToHourAMPM(totalMinutes: number): string | null {
+  if (totalMinutes < 0 || !Number.isInteger(totalMinutes)) {
+    return null;
+  }
+  const hours24 = Math.floor(totalMinutes / 60) % 24;
+  const period = hours24 < 12 ? "AM" : "PM";
+  const hour12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+  return `${hour12} ${period}`;
+}
+
+export function minsToTime(totalMinutes: number) {
   if (totalMinutes < 0 || !Number.isInteger(totalMinutes)) {
     return null;
   }
 
+  if (totalMinutes === 0) {
+    return "00:00";
+  }
+
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  const ampm = hours < 12 ? "AM" : "PM";
-  const twelveHourFormat = hours % 12 === 0 ? 12 : hours % 12;
 
   const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
 
-  return `${twelveHourFormat}:${formattedMinutes} ${ampm}`;
+  return `${hours}:${formattedMinutes}`;
 }
