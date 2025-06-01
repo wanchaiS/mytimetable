@@ -1,1 +1,2 @@
-export type Preference = "Morning" | "Late";
+export type Preference = "Compact" | "Relaxed" | "Late";
+export type CalendarView = "weekdays" | "week";
