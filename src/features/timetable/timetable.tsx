@@ -181,11 +181,11 @@ export default function Calendar(): React.JSX.Element {
         <Button
           onClick={() => setShowDrawer(true)}
           className={cn(
-            "fixed bottom-0 left-1/2 z-50 flex h-4 w-18 -translate-x-1/2 translate-y-1/8 items-center justify-center rounded-t-full bg-blue-500 px-6 py-2 text-white shadow-lg md:hidden",
+            "fixed bottom-0 left-1/2 z-50 flex h-5 w-20 -translate-x-1/2 translate-y-1/8 items-center justify-center rounded-t-full bg-blue-500 px-6 py-2 text-white shadow-2xl md:hidden",
             showDrawer && "hidden",
           )}
         >
-          <ChevronUp className="h-4 w-4" />
+          <ChevronUp className="h-5 w-5 shadow-lg" strokeWidth={5} />
         </Button>
       )}
       {isMobile && (
