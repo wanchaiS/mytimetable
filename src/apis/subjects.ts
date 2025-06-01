@@ -1,5 +1,6 @@
 interface SearchSubjectsParams {
   searchTerm: string;
+  semester: string;
 }
 
 type SearchSubjectsQueryKey = ["subjects", SearchSubjectsParams];
@@ -39,11 +40,10 @@ export async function searchSubjects({
 }: {
   queryKey: SearchSubjectsQueryKey;
 }): Promise<SubjectsResponse> {
-  const [, { searchTerm }] = queryKey;
-  const requestBody = new URLSearchParams();
-  requestBody.append("search-term", searchTerm);
+  const [, { searchTerm, semester }] = queryKey;
+
   const response = await fetch(
-    `${import.meta.env.VITE_LAMBDA_API}/subjects?searchTerm=${searchTerm}`,
+    `${import.meta.env.VITE_LAMBDA_API}/subjects?searchTerm=${searchTerm}&semester=${mapSemester(semester)}`,
   );
 
   if (!response.ok) {
@@ -51,4 +51,8 @@ export async function searchSubjects({
   }
 
   return response.json();
+}
+
+function mapSemester(semester: string): "AUT" | "SPR" {
+  return semester === "Autumn" ? "AUT" : "SPR";
 }

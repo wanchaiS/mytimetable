@@ -1,5 +1,5 @@
 import { DAY_ABBREVIATIONS } from "@/constants";
-import { Day } from "@/hooks/useSubjects";
+import { Day } from "@/hooks/useSearchSubjects";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Badge } from "./badge";
