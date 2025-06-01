@@ -145,6 +145,9 @@ export default function Calendar(): React.JSX.Element {
                       );
                       if (clickedSubject) {
                         setActiveSubjectCode(clickedSubject.callista_code);
+                        if (isMobile) {
+                          setShowDrawer(true);
+                        }
                       }
                     }}
                   />
@@ -185,8 +188,9 @@ export default function Calendar(): React.JSX.Element {
           <ChevronUp className="h-4 w-4" />
         </Button>
       )}
-      {showDrawer && isMobile && (
+      {isMobile && (
         <SubjectsDrawer
+          isOpen={showDrawer}
           subjects={subjects}
           maxCredit={maxCredit}
           activeSubjectCode={activeSubjectCode}
@@ -194,7 +198,7 @@ export default function Calendar(): React.JSX.Element {
           onSelectActivity={onSelectActivity}
           onRemoveSubject={onRemoveSubject}
           onSearchSubjects={setShowAddSubject}
-          onClose={() => setShowDrawer(false)}
+          onOpenChange={setShowDrawer}
         />
       )}
 
