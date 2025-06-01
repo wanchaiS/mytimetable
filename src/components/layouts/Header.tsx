@@ -1,10 +1,10 @@
-import { UserProfile } from "../ui/user-profile";
+import { ContactUs } from "@/features/contact-us/contact-us";
 
 export default function Header() {
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log("Logout clicked");
-  };
+  // const handleLogout = () => {
+  //   // TODO: Implement logout logic
+  //   console.log("Logout clicked");
+  // };
 
   return (
     <header className="flex h-15 items-center justify-between border-b border-(--border) bg-(--background) px-4">
@@ -16,7 +16,8 @@ export default function Header() {
           Timetable<span className="text-blue-500">X</span>
         </div>
       </div>
-      <UserProfile onLogout={handleLogout} />
+      <ContactUs />
+      {/* <UserProfile onLogout={handleLogout} /> */}
     </header>
   );
 }
