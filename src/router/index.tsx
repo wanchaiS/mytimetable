@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router";
 
 import { Providers } from "@/Providers";
-import Dashboard from "../pages/main/main";
 import NotFoundRoute from "../pages/not-found/not-found";
+import TimetablePlanner from "../pages/timetable-planner/timetable-planner";
 
 const router = createBrowserRouter(
   [
@@ -12,11 +12,11 @@ const router = createBrowserRouter(
       children: [
         {
           index: true,
-          element: <Navigate to="/main" replace />,
+          element: <Navigate to="/timetable-planner" replace />,
         },
         {
-          path: "/main",
-          element: <Dashboard />,
+          path: "/timetable-planner",
+          element: <TimetablePlanner />,
         },
         {
           path: "*",
