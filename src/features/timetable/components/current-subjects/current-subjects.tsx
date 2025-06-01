@@ -47,7 +47,7 @@ export function CurrentSubjects({
         </Button>
       </div>
       {/* Subjects */}
-      <div className="flex h-full flex-col gap-2 overflow-y-auto">
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
         {subjects.map((subject) => (
           <div
             key={subject.code}
