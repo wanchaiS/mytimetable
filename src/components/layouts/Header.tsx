@@ -1,4 +1,4 @@
-import { ContactUs } from "@/features/contact-us/contact-us";
+import { ContactUs } from "@/components/contact-us/ContactUs";
 
 export default function Header() {
   // const handleLogout = () => {

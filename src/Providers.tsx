@@ -1,4 +1,4 @@
-import { MainErrorFallback } from "@/components/errors/main";
+import { MainErrorFallback } from "@/components/errors/MainErrorFallback";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { Suspense } from "react";
