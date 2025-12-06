@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter } from "react-router";
 
 import { Providers } from "@/Providers";
 import NotFoundRoute from "../pages/not-found/not-found";
@@ -12,10 +12,6 @@ const router = createBrowserRouter(
       children: [
         {
           index: true,
-          element: <Navigate to="/timetable-planner" replace />,
-        },
-        {
-          path: "/timetable-planner",
           element: <TimetablePlanner />,
         },
         {
