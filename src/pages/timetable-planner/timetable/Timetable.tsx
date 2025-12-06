@@ -30,7 +30,7 @@ export default function Timetable(): React.JSX.Element {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showTimeReserver, setShowTimeReserver] = useState(false);
   const times = getTimes();
-  const { calendarView, semester } = useTimetableStore();
+  const { calendarView, semester, year } = useTimetableStore();
   const days = getDays(calendarView);
   const {
     subjects,
@@ -39,7 +39,6 @@ export default function Timetable(): React.JSX.Element {
     onAddSubject,
     onRemoveSubject,
     onAddReservation,
-    onRemoveReservation,
     reservations,
   } = use(TimetableContext);
 
@@ -228,6 +227,7 @@ export default function Timetable(): React.JSX.Element {
           onAddSubject={onAddSubject}
           subjects={subjects}
           semester={semester}
+          year={year}
         />
       )}
 

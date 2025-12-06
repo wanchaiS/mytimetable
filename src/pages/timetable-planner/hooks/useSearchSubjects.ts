@@ -35,9 +35,9 @@ export interface ActivityType {
   semester: string;
 }
 
-const useSearchSubjects = (search: string, semester: string) => {
+const useSearchSubjects = (search: string, semester: string, year: number) => {
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["subjects", { searchTerm: search, semester }],
+    queryKey: ["subjects", { searchTerm: search, semester, year }],
     queryFn: searchSubjects,
     enabled: !!search,
     gcTime: 0,
