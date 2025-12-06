@@ -17,16 +17,19 @@ export default function SearchSubjects({
   onAddSubject,
   subjects,
   semester,
+  year,
 }: {
   onOpenChange: (open: boolean) => void;
   onAddSubject: (subject: SubjectType) => void;
   subjects: SubjectType[];
   semester: string;
+  year: number;
 }) {
   const [search, setSearch] = useState<string>("");
   const { data, isLoading, isError, refetch } = useSearchSubjects(
     search,
     semester,
+    year,
   );
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -111,7 +114,7 @@ export default function SearchSubjects({
     <Dialog open={true} onOpenChange={onOpenChange}>
       <DialogContent className="w-3xl">
         <DialogHeader>
-          <DialogTitle>Search for {semester} subjects</DialogTitle>
+          <DialogTitle>Search for {semester} {year} subjects</DialogTitle>
         </DialogHeader>
         <div>
           <form onSubmit={handleSearch}>

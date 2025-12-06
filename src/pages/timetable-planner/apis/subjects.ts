@@ -1,6 +1,7 @@
 interface SearchSubjectsParams {
   searchTerm: string;
   semester: string;
+  year: number;
 }
 
 type SearchSubjectsQueryKey = ["subjects", SearchSubjectsParams];
@@ -40,10 +41,10 @@ export async function searchSubjects({
 }: {
   queryKey: SearchSubjectsQueryKey;
 }): Promise<SubjectsResponse> {
-  const [, { searchTerm, semester }] = queryKey;
+  const [, { searchTerm, semester, year }] = queryKey;
 
   const response = await fetch(
-    `${import.meta.env.VITE_SUBJECTS_API}/subjects?searchTerm=${searchTerm}&semester=${mapSemester(semester)}`,
+    `${import.meta.env.VITE_SUBJECTS_API}/subjects?searchTerm=${searchTerm}&semester=${mapSemester(semester)}&year=${year}`,
   );
 
   if (!response.ok) {
