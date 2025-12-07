@@ -79,7 +79,7 @@ export function ContactUs() {
           <textarea
             className="w-full rounded-md border p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             rows={5}
-            placeholder="Let us know your thoughts. If reporting an issue, please include subject codes (e.g., COMP1010) so we can recreate it."
+            placeholder="Let us know your thoughts. If reporting an issue, please include subject codes so we can recreate it."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             required
@@ -104,7 +104,7 @@ export function ContactUs() {
         </form>
 
         {/* Footnote with external links */}
-        <div className="border-t pt-4 text-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground border-t pt-4 text-center text-sm">
           <p className="mb-2 text-xs">
             For bug reports or feedback with screenshots/context:
           </p>
@@ -113,14 +113,14 @@ export function ContactUs() {
               href="https://github.com/wanchaiS/mytimetable/issues/new"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-slate-600 hover:text-slate-900 transition-colors"
+              className="flex items-center gap-1 text-slate-600 transition-colors hover:text-slate-900"
             >
               <Github className="h-4 w-4" />
               <span>Raise an issue</span>
             </a>
             <a
               href="mailto:wanchai.sangkusolwong@student.uts.edu.au"
-              className="flex items-center gap-1 text-slate-600 hover:text-slate-900 transition-colors"
+              className="flex items-center gap-1 text-slate-600 transition-colors hover:text-slate-900"
             >
               <Mail className="h-4 w-4" />
               <span>wanchai.sangkusolwong@student.uts.edu.au</span>
