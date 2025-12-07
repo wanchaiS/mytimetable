@@ -79,7 +79,7 @@ export function ContactUs() {
           <textarea
             className="w-full rounded-md border p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             rows={5}
-            placeholder="Let us know your thoughts. If reporting an issue, please include subject codes so we can recreate it."
+            placeholder="Let us know your thoughts. If reporting an issue, please include subject codes."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             required
@@ -106,7 +106,8 @@ export function ContactUs() {
         {/* Footnote with external links */}
         <div className="text-muted-foreground border-t pt-4 text-center text-sm">
           <p className="mb-2 text-xs">
-            For bug reports or feedback with screenshots/context:
+            You can also report issues or contact me directly via the links
+            below.
           </p>
           <div className="flex items-center justify-center gap-4">
             <a
