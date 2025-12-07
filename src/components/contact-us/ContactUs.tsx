@@ -72,7 +72,7 @@ export function ContactUs() {
             onChange={(e) => setName(e.target.value)}
           />
           <Input
-            placeholder="Email (optional)"
+            placeholder="Email (optional) - for follow-up"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
