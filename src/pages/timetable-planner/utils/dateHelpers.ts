@@ -1,23 +1,10 @@
-import { ActivityType } from "@/pages/timetable-planner/hooks/useSearchSubjects";
-
-export function isActivityOverlap(
-  activity1: ActivityType,
-  activity2: ActivityType,
+export function isTimeOverlap(
+  startTimeAInMins: number,
+  endTimeAInMins: number,
+  startTimeBInMins: number,
+  endTimeBInMins: number,
 ): boolean {
-  // Check if one activity ends exactly when the other starts (back-to-back)
-  if (
-    activity1.end_time_mins === activity2.start_time_mins ||
-    activity2.end_time_mins === activity1.start_time_mins
-  ) {
-    return false;
-  }
-
-  // Activities collide if one starts before the other ends
-  return (
-    activity1.start_time_mins < activity2.end_time_mins &&
-    activity2.start_time_mins < activity1.end_time_mins
-  );
-  return false;
+  return startTimeAInMins < endTimeBInMins && endTimeAInMins > startTimeBInMins;
 }
 
 function getFullDate(date: Date): string {

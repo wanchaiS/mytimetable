@@ -5,7 +5,7 @@ import {
   SubjectsResponse,
 } from "@/pages/timetable-planner/apis/subjects";
 import { useQuery } from "@tanstack/react-query";
-
+import { Day, WEEK_DAYS, WEEKEND_DAYS } from "../types";
 export interface SubjectType {
   code: string;
   credit: number;
@@ -20,18 +20,19 @@ export interface ActivityType {
   code: string;
   name: string;
   type: string;
-  type_desc: string;
+  typeDesc: string;
   activity: string;
-  day: string;
+  day: Day;
   room: string;
   duration: number;
-  start_time: string;
-  start_time_mins: number;
-  end_time_mins: number;
+  startTime: string;
+  startTimeMins: number;
+  endTimeMins: number;
   dates: string[];
   id: string;
   selected: boolean;
-  codeType: string;
+  subjectActivityGroupId: string;
+  subjectActivityTimeSlotId: string;
   semester: string;
 }
 
@@ -103,21 +104,31 @@ function parseActivityResponse(
     name: subjectResponse.description,
     code: activityResponse.subject_code,
     type: activityResponse.activity_group_code,
-    type_desc: activityResponse.activity_type,
+    typeDesc: activityResponse.activity_type,
     activity: activityResponse.activity_code,
     room: activityResponse.location,
     duration,
-    start_time: activityResponse.start_time,
-    start_time_mins: startInMins,
-    end_time_mins: endInMins,
-    day: activityResponse.day_of_week,
+    startTime: activityResponse.start_time,
+    startTimeMins: startInMins,
+    endTimeMins: endInMins,
+    day: tryparseDay(activityResponse.day_of_week),
     dates: activityDates,
     selected: false,
-    codeType: `${activityResponse.subject_code}|${activityResponse.activity_group_code}`,
+    subjectActivityGroupId: `${activityResponse.subject_code}|${activityResponse.activity_group_code}`,
+    subjectActivityTimeSlotId: `${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.day_of_week}|${activityResponse.start_time}`,
     semester: tryParseSemester(activityResponse.semester),
   };
 
   return activity;
+}
+
+function tryparseDay(day: string): Day {
+  const allDays = [...WEEK_DAYS, ...WEEKEND_DAYS];
+  if (allDays.includes(day as Day)) {
+    return day as Day;
+  }
+  console.error(`Invalid day found: ${day}`);
+  return "Mon"; // default fallback
 }
 
 function tryParseSemester(sem: string) {

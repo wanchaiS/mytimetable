@@ -109,8 +109,8 @@ function getSelectedActivityPerType(subject: SubjectType): string[] {
   // Group activities by type
   const byType: { [type: string]: ActivityType[] } = {};
   subject.activities.forEach((activity) => {
-    if (!byType[activity.type_desc]) byType[activity.type_desc] = [];
-    byType[activity.type_desc].push(activity);
+    if (!byType[activity.typeDesc]) byType[activity.typeDesc] = [];
+    byType[activity.typeDesc].push(activity);
   });
 
   // For each type, find the selected activity and format the string

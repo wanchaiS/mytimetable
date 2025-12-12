@@ -39,7 +39,6 @@ export default function Timetable(): React.JSX.Element {
     onAddSubject,
     onRemoveSubject,
     onAddReservation,
-    reservations,
   } = use(TimetableContext);
 
   const selectedActivities = subjects.flatMap((sub) =>
@@ -52,7 +51,7 @@ export default function Timetable(): React.JSX.Element {
 
     // Find the earliest by start_time_mins
     const earliest = selectedActivities.reduce((min, a) =>
-      a.start_time_mins < min.start_time_mins ? a : min,
+      a.startTimeMins < min.startTimeMins ? a : min,
     );
 
     // Scroll to the activity block
@@ -66,8 +65,6 @@ export default function Timetable(): React.JSX.Element {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log(reservations);
 
   return (
     <ResizablePanelGroup

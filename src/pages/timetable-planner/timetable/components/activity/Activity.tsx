@@ -1,6 +1,7 @@
 import { ActivityType } from "@/pages/timetable-planner/hooks/useSearchSubjects";
 import React, { use } from "react";
 import { TimetableContext } from "../../../contexts/TimetableContext";
+import { cn } from "@/lib/utils";
 
 interface ActivityProps {
   activity: ActivityType;
@@ -12,12 +13,19 @@ interface ActivityProps {
 const MINUTES_IN_DAY = 1440;
 
 function getTop(activity: ActivityType) {
-  const topPct = (activity.start_time_mins / MINUTES_IN_DAY) * 100;
+  const topPct = (activity.startTimeMins / MINUTES_IN_DAY) * 100;
   return topPct;
 }
 function getBottom(activity: ActivityType) {
-  const bottomPct = 100 - (activity.end_time_mins / MINUTES_IN_DAY) * 100;
+  const bottomPct = 100 - (activity.endTimeMins / MINUTES_IN_DAY) * 100;
   return bottomPct;
+}
+
+function getLineClamp(durationMins: number): string {
+  if (durationMins <= 60) return 'line-clamp-2';
+  if (durationMins <= 120) return 'line-clamp-3';
+  if (durationMins <= 180) return 'line-clamp-4';
+  return 'line-clamp-6';
 }
 
 export default function Activity({
@@ -56,11 +64,22 @@ export default function Activity({
           backgroundColor: `rgba(${subject?.color}, 0.7)`,
           borderColor: `rgb(${subject?.color})`,
         }}
-        className="bg-background flex h-full overflow-hidden rounded-sm border-l-10 p-1"
+        className="bg-background flex h-full flex-col overflow-hidden rounded-sm border-l-10 p-1"
       >
-        <div className="w-full overflow-hidden text-xs break-words text-ellipsis whitespace-pre-line md:text-sm">
-          {subject?.callista_code} - {subject?.name} {activity.type} <br />
-          {activity.activity}
+        <div
+          className={cn(
+            "w-full text-xs md:text-sm",
+            "overflow-hidden break-words",
+            getLineClamp(activity.duration)
+          )}
+          title={`${subject?.callista_code} - ${activity.typeDesc}:${activity.activity}\n${subject?.name}`}
+        >
+          <div className="font-semibold">
+            {subject?.callista_code} - {activity.typeDesc}:{activity.activity}
+          </div>
+          <div className="text-[0.7rem] md:text-xs opacity-90">
+            {subject?.name}
+          </div>
         </div>
       </div>
     </div>

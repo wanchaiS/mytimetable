@@ -1,5 +1,5 @@
 import { ActivityType } from "@/pages/timetable-planner/hooks/useSearchSubjects";
-import { isActivityOverlap } from "@/pages/timetable-planner/utils/dateHelpers";
+import { isTimeOverlap } from "@/pages/timetable-planner/utils/dateHelpers";
 import { Fragment } from "react/jsx-runtime";
 import Activity from "../activity/Activity";
 
@@ -55,7 +55,7 @@ function getActivityClusters(
 
   // sort activities
   const sorted = [...activities].sort(
-    (a, b) => a.start_time_mins - b.start_time_mins,
+    (a, b) => a.startTimeMins - b.startTimeMins,
   );
 
   for (let i = 0; i < sorted.length; i++) {
@@ -69,7 +69,12 @@ function getActivityClusters(
       for (let i = 0; i < cluster.members.length; i++) {
         const column = cluster.members[i];
         const foundOverlap = column.some((ac) =>
-          isActivityOverlap(ac, activity),
+          isTimeOverlap(
+            ac.startTimeMins,
+            ac.endTimeMins,
+            activity.startTimeMins,
+            activity.endTimeMins,
+          ),
         );
         if (!foundOverlap) {
           column.push(activity);
@@ -109,7 +114,14 @@ function findCluster(
       const column = cluster.members[j];
       for (let k = 0; k < column.length; k++) {
         const existedAc = column[k];
-        if (isActivityOverlap(activity, existedAc)) {
+        if (
+          isTimeOverlap(
+            activity.startTimeMins,
+            activity.endTimeMins,
+            existedAc.startTimeMins,
+            existedAc.endTimeMins,
+          )
+        ) {
           return cluster;
         }
       }
