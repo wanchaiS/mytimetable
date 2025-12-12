@@ -5,7 +5,7 @@ import {
   SubjectType,
 } from "@/pages/timetable-planner/hooks/useSearchSubjects";
 import { isTimeOverlap } from "@/pages/timetable-planner/utils/dateHelpers";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface SubjectDetailsProps {
@@ -78,7 +78,8 @@ export function SubjectDetails({
               <span
                 className={cn(
                   "font-semibold",
-                  isDrilledDown && "cursor-pointer hover:text-muted-foreground transition-colors"
+                  isDrilledDown &&
+                    "hover:text-muted-foreground cursor-pointer transition-colors",
                 )}
                 onClick={() => isDrilledDown && setDrilldownSlot(null)}
               >
@@ -86,8 +87,10 @@ export function SubjectDetails({
               </span>
               {isDrilledDown && (
                 <>
-                  <span className="text-muted-foreground">›</span>
-                  <span className="text-muted-foreground text-xs">
+                  <span className="">
+                    <ChevronRight className="h-4 w-4" />
+                  </span>
+                  <span className="font-semibold">
                     {drilldownSlot.slot.day} {drilldownSlot.slot.startTime} -{" "}
                     {drilldownSlot.slot.endTime}
                   </span>

@@ -32,7 +32,11 @@ function CalendarPanel({
           </SelectContent>
         </Select>
 
-        <Button variant="outline" onClick={() => setShowTimeReserver(true)}>
+        <Button
+          disabled
+          variant="outline"
+          onClick={() => setShowTimeReserver(true)}
+        >
           <CalendarX className="h-4 w-4" />
           Reserve {!isMobile && "Time"}
         </Button>
