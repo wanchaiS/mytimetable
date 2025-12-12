@@ -16,19 +16,19 @@ export default function SearchSubjects({
   onOpenChange,
   onAddSubject,
   subjects,
-  semester,
+  selectedSemester,
   year,
 }: {
   onOpenChange: (open: boolean) => void;
   onAddSubject: (subject: SubjectType) => void;
   subjects: SubjectType[];
-  semester: string;
   year: number;
+  selectedSemester: string;
 }) {
   const [search, setSearch] = useState<string>("");
   const { data, isLoading, isError, refetch } = useSearchSubjects(
     search,
-    semester,
+    selectedSemester,
     year,
   );
 
@@ -90,7 +90,9 @@ export default function SearchSubjects({
               <div>{subject.name}</div>
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <div>{subject.callista_code}</div>
-                <div className="text-xs text-gray-500">{subject.semester}</div>
+                <div className="text-xs text-gray-500">
+                  Sem: {subject.semester}
+                </div>
               </div>
             </div>
             <div>
@@ -114,7 +116,7 @@ export default function SearchSubjects({
     <Dialog open={true} onOpenChange={onOpenChange}>
       <DialogContent className="w-3xl">
         <DialogHeader>
-          <DialogTitle>Search for {semester} {year} subjects</DialogTitle>
+          <DialogTitle>Search for {year} subjects</DialogTitle>
         </DialogHeader>
         <div>
           <form onSubmit={handleSearch}>

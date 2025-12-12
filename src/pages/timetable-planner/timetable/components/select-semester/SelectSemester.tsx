@@ -1,28 +1,29 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Semester } from "@/pages/timetable-planner/store/useTimetableStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TimetableContext } from "@/pages/timetable-planner/contexts/TimetableContext";
+import { useContext } from "react";
 
-interface SelectSemesterProps {
-  semester: string;
-  setSemester: (semester: Semester) => void;
-}
+export default function SelectSemester() {
+  const { selectedSemester, onChangeSemester } = useContext(TimetableContext);
+  const semesters = ["Autumn", "Spring"];
 
-export default function SelectSemester({
-  semester,
-  setSemester,
-}: SelectSemesterProps) {
   return (
-    <ToggleGroup
-      type="single"
-      variant="outline"
-      value={semester}
-      onValueChange={setSemester}
-    >
-      <ToggleGroupItem value="Autumn" aria-label="Autumn">
-        Autumn
-      </ToggleGroupItem>
-      <ToggleGroupItem value="Spring" aria-label="Spring">
-        Spring
-      </ToggleGroupItem>
-    </ToggleGroup>
+    <Select value={selectedSemester} onValueChange={onChangeSemester}>
+      <SelectTrigger>
+        <SelectValue defaultValue={semesters[0]} />
+      </SelectTrigger>
+      <SelectContent>
+        {semesters.map((sem) => (
+          <SelectItem key={sem} value={sem}>
+            {sem}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

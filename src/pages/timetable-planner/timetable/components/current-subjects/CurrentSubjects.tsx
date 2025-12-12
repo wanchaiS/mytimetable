@@ -8,7 +8,6 @@ import {
   ActivityType,
   SubjectType,
 } from "@/pages/timetable-planner/hooks/useSearchSubjects";
-import useTimetableStore from "@/pages/timetable-planner/store/useTimetableStore";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 import SelectSemester from "../select-semester/SelectSemester";
 
@@ -17,7 +16,7 @@ interface CurrentSubjectsProps {
   maxCredit: number;
   onSearchSubjects: (open: boolean) => void;
   onClickSubject: (subjectCode: string | undefined) => void;
-  onRemoveSubject: (subjectCode: string) => void;
+  onRemoveSubject: (subjectCode: string, semester: string) => void;
 }
 
 export function CurrentSubjects({
@@ -27,7 +26,6 @@ export function CurrentSubjects({
   onClickSubject,
   onRemoveSubject,
 }: CurrentSubjectsProps) {
-  const { semester, setSemester } = useTimetableStore();
   return (
     <>
       {/* Header */}
@@ -39,7 +37,7 @@ export function CurrentSubjects({
             {maxCredit} Credits
           </div>
         </div>
-        <SelectSemester semester={semester} setSemester={setSemester} />
+        <SelectSemester />
         <Button
           size="icon"
           // variant="outline"
@@ -90,7 +88,7 @@ export function CurrentSubjects({
                   className="w-full justify-start p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onRemoveSubject(subject.callista_code);
+                    onRemoveSubject(subject.callista_code, subject.semester);
                   }}
                 >
                   <Trash2 className="h-4 w-4" />

@@ -1,9 +1,8 @@
-import { ReactNode, useCallback, useEffect, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { produce } from "immer";
 import { ActivityType, SubjectType } from "../hooks/useSearchSubjects";
-import useTimetableStore from "../store/useTimetableStore";
 import { ReservationType } from "../types";
 import { getRandomColor } from "../utils/colorHelper";
 import { TimetableContext, TimetableState } from "./TimetableContext";
@@ -15,35 +14,38 @@ type TimetableProviderProps = {
 export default function TimetableProvider({
   children,
 }: TimetableProviderProps) {
-  const { semester } = useTimetableStore();
-
   const [timetable, setTimetable] = useLocalStorage<TimetableState>(
-    `timetable-${semester}`,
+    "timetable",
     {
       subjects: [],
       reservations: [],
       maxCredit: 24,
-      semester,
-      version: 1,
+      selectedSemester: "Autumn",
+      version: 2,
     },
   );
 
-  useEffect(() => {
-    if (timetable.version === undefined) {
-      setTimetable(
-        produce((draft: TimetableState) => {
-          draft.version = 1;
-          draft.reservations = [];
-        }),
-      );
-    }
-  }, [setTimetable, timetable.version]);
+  // Migration logic: from version 1 (subjects array) to version 2
+  if (timetable.version === undefined || timetable.version === 1) {
+    setTimetable({
+      subjects: [],
+      reservations: [],
+      maxCredit: 24,
+      selectedSemester: "Autumn",
+      version: 2,
+    });
+  }
 
   const handleSelectActivity = useCallback(
     (activity: ActivityType) => {
       setTimetable(
         produce((draft: TimetableState) => {
-          const [subjectIdx, acIdx] = getIndexes(draft.subjects, activity);
+          const subjectIdx = draft.subjects.findIndex(
+            (s) => s.code === activity.code && s.semester === activity.semester,
+          );
+          const acIdx = draft.subjects[subjectIdx].activities.findIndex(
+            (a) => a.id === activity.id,
+          );
           // toggle activity
           draft.subjects[subjectIdx].activities[acIdx].selected =
             !draft.subjects[subjectIdx].activities[acIdx].selected;
@@ -86,9 +88,6 @@ export default function TimetableProvider({
     (subject: SubjectType) => {
       setTimetable(
         produce((draft: TimetableState) => {
-          if (draft.semester !== subject.semester) {
-            return;
-          }
           subject.color = getRandomColor(
             draft.subjects.map((s) => s.color).filter((c) => c !== undefined),
           );
@@ -100,11 +99,11 @@ export default function TimetableProvider({
   );
 
   const handleRemoveSubject = useCallback(
-    (subjectCode: string) => {
+    (subjectCode: string, semester: string) => {
       setTimetable(
         produce((draft: TimetableState) => {
           const subjectIdx = draft.subjects.findIndex(
-            (s) => s.callista_code === subjectCode,
+            (s) => s.callista_code === subjectCode && s.semester === semester,
           );
           if (subjectIdx === -1) {
             return;
@@ -150,9 +149,41 @@ export default function TimetableProvider({
     [setTimetable],
   );
 
+  const handleChangeSemester = useCallback(
+    (semester: string) => {
+      setTimetable(
+        produce((draft: TimetableState) => {
+          draft.selectedSemester = semester;
+        }),
+      );
+    },
+    [setTimetable],
+  );
+
+  const filteredSubjects = useMemo(() => {
+    return timetable.subjects.filter((s) => {
+      // if semester is Autumn returns startsWith AU
+      if (timetable.selectedSemester === "Autumn") {
+        return s.semester.startsWith("AU");
+      }
+      // if semester is Spring returns startsWith SP
+      else if (timetable.selectedSemester === "Spring") {
+        return s.semester.startsWith("SP");
+      }
+      // else returns all
+      return true;
+    });
+  }, [timetable.subjects, timetable.selectedSemester]);
+
+  const subjects = filteredSubjects;
+
   const ctxValues = useMemo(
     () => ({
-      ...timetable,
+      subjects: subjects,
+      maxCredit: timetable.maxCredit,
+      selectedSemester: timetable.selectedSemester,
+      reservations: timetable.reservations,
+      version: timetable.version,
       onSelectActivity: handleSelectActivity,
       onSelectActivities: handleSelectActivities,
       onRemoveSubject: handleRemoveSubject,
@@ -160,9 +191,14 @@ export default function TimetableProvider({
       onChangeMaxCredit: handleChangeMaxCredit,
       onAddReservation: handleAddReservation,
       onRemoveReservation: handleRemoveReservation,
+      onChangeSemester: handleChangeSemester,
     }),
     [
-      timetable,
+      subjects,
+      timetable.maxCredit,
+      timetable.selectedSemester,
+      timetable.reservations,
+      timetable.version,
       handleSelectActivity,
       handleSelectActivities,
       handleRemoveSubject,
@@ -170,6 +206,7 @@ export default function TimetableProvider({
       handleChangeMaxCredit,
       handleAddReservation,
       handleRemoveReservation,
+      handleChangeSemester,
     ],
   );
 
@@ -177,20 +214,3 @@ export default function TimetableProvider({
 }
 
 TimetableProvider.displayName = "TimetableProvider";
-
-function getIndexes(
-  subjects: SubjectType[],
-  activity?: ActivityType,
-  subject?: SubjectType,
-): [number, number] {
-  if (activity !== undefined) {
-    const subjectIdx = subjects.findIndex((s) => s.code === activity.code);
-    const acIdx = subjects[subjectIdx].activities.findIndex(
-      (a) => a.id === activity.id,
-    );
-    return [subjectIdx, acIdx];
-  }
-
-  const subjectIdx = subjects.findIndex((s) => s.code === subject?.code);
-  return [subjectIdx, -1];
-}

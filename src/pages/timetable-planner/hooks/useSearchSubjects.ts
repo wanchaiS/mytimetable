@@ -36,9 +36,13 @@ export interface ActivityType {
   semester: string;
 }
 
-const useSearchSubjects = (search: string, semester: string, year: number) => {
+const useSearchSubjects = (
+  search: string,
+  selectedSemester: string,
+  year: number,
+) => {
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["subjects", { searchTerm: search, semester, year }],
+    queryKey: ["subjects", { searchTerm: search, year }],
     queryFn: searchSubjects,
     enabled: !!search,
     gcTime: 0,
@@ -46,7 +50,7 @@ const useSearchSubjects = (search: string, semester: string, year: number) => {
 
   // transform
   return {
-    data: parseSubjectsResponse(data, semester),
+    data: parseSubjectsResponse(data, selectedSemester),
     isLoading,
     isError,
     refetch,
@@ -55,7 +59,7 @@ const useSearchSubjects = (search: string, semester: string, year: number) => {
 
 function parseSubjectsResponse(
   subjectsResponse: SubjectsResponse | undefined,
-  semester: string,
+  selectedSemester: string,
 ): SubjectType[] {
   if (
     subjectsResponse === undefined ||
@@ -68,7 +72,18 @@ function parseSubjectsResponse(
     (subjectKey: string) => parseSubjectResponse(subjectsResponse[subjectKey]),
   );
 
-  return parsedSubjects.filter((s) => s.semester === semester);
+  return parsedSubjects.filter((s) => {
+    // if semester is Autumn returns startsWith AU
+    if (selectedSemester === "Autumn") {
+      return s.semester.startsWith("AU");
+    }
+    // if semester is Spring returns startsWith SP
+    else if (selectedSemester === "Spring") {
+      return s.semester.startsWith("SP");
+    }
+    // else returns all
+    return true;
+  });
 }
 
 function parseSubjectResponse(subjectReponse: SubjectResponse): SubjectType {
@@ -77,7 +92,7 @@ function parseSubjectResponse(subjectReponse: SubjectResponse): SubjectType {
     code: subjectReponse.subject_code,
     callista_code: subjectReponse.callista_code,
     credit: 6,
-    semester: tryParseSemester(subjectReponse.semester),
+    semester: subjectReponse.semester,
     color: undefined,
     activities: Object.keys(subjectReponse.activities).map((activityKey) =>
       parseActivityResponse(
@@ -100,7 +115,7 @@ function parseActivityResponse(
   );
 
   const activity: ActivityType = {
-    id: `${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.activity_code}`,
+    id: `${activityResponse.semester}|${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.activity_code}`,
     name: subjectResponse.description,
     code: activityResponse.subject_code,
     type: activityResponse.activity_group_code,
@@ -114,9 +129,9 @@ function parseActivityResponse(
     day: tryparseDay(activityResponse.day_of_week),
     dates: activityDates,
     selected: false,
-    subjectActivityGroupId: `${activityResponse.subject_code}|${activityResponse.activity_group_code}`,
-    subjectActivityTimeSlotId: `${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.day_of_week}|${activityResponse.start_time}`,
-    semester: tryParseSemester(activityResponse.semester),
+    subjectActivityGroupId: `${activityResponse.semester}|${activityResponse.subject_code}|${activityResponse.activity_group_code}`,
+    subjectActivityTimeSlotId: `${activityResponse.semester}|${activityResponse.subject_code}|${activityResponse.activity_group_code}|${activityResponse.day_of_week}|${activityResponse.start_time}`,
+    semester: activityResponse.semester,
   };
 
   return activity;
@@ -129,17 +144,6 @@ function tryparseDay(day: string): Day {
   }
   console.error(`Invalid day found: ${day}`);
   return "Mon"; // default fallback
-}
-
-function tryParseSemester(sem: string) {
-  switch (sem) {
-    case "SPR":
-      return "Spring";
-    case "AUT":
-      return "Autumn";
-    default:
-      return "Other";
-  }
 }
 
 function parseDates(dates: string[]): string[] {

@@ -4,26 +4,32 @@ import { ReservationType } from "../types";
 
 export interface TimetableState {
   maxCredit: number;
-  semester: string;
+  selectedSemester: string;
   subjects: SubjectType[];
   reservations: ReservationType[];
   version: number;
 }
 
-type TimetableContextType = TimetableState & {
+type TimetableContextType = {
+  subjects: SubjectType[]; // Runtime loaded subjects
+  maxCredit: number;
+  selectedSemester: string;
+  reservations: ReservationType[];
+  version: number;
   onSelectActivity: (activity: ActivityType) => void;
   onSelectActivities: (activities: ActivityType[]) => void;
   onAddSubject: (subject: SubjectType) => void;
-  onRemoveSubject: (subjectCode: string) => void;
+  onRemoveSubject: (subjectCode: string, semester: string) => void;
   onChangeMaxCredit: (maxCredit: number) => void;
   onAddReservation: (reservation: ReservationType) => void;
   onRemoveReservation: (reservation: ReservationType) => void;
+  onChangeSemester: (semester: string) => void;
 };
 
 export const TimetableContext = createContext<TimetableContextType>({
   subjects: [],
   maxCredit: 0,
-  semester: "Autumn",
+  selectedSemester: "AUT",
   reservations: [],
   version: 1,
   onSelectActivity: () => {},
@@ -33,4 +39,5 @@ export const TimetableContext = createContext<TimetableContextType>({
   onChangeMaxCredit: () => {},
   onAddReservation: () => {},
   onRemoveReservation: () => {},
+  onChangeSemester: () => {},
 });

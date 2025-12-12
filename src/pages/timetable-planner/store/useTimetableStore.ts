@@ -1,39 +1,20 @@
 import { CalendarView } from "@/pages/timetable-planner/types";
 import { create } from "zustand";
 
-export type Semester = "Autumn" | "Spring";
-
 const useTimetableStore = create<{
   calendarView: CalendarView;
-  semester: Semester;
   year: number;
   setCalendarView: (calendarView: CalendarView) => void;
-  setSemester: (semester: Semester) => void;
   setYear: (year: number) => void;
 }>((set) => ({
   calendarView: getDefaultCalendarView(),
-  semester: loadSemester(),
   year: loadYear(),
   setCalendarView: (calendarView) => set({ calendarView }),
-  setSemester: (semester: Semester) => {
-    set({ semester });
-    localStorage.setItem("semester", semester);
-  },
   setYear: (year: number) => {
     set({ year });
     localStorage.setItem("year", year.toString());
   },
 }));
-
-// load semester from session storage
-function loadSemester(): Semester {
-  const semester = localStorage.getItem("semester");
-  if (semester) {
-    return semester as Semester;
-  }
-  localStorage.setItem("semester", "Autumn");
-  return "Autumn";
-}
 
 function loadYear(): number {
   const storedYear = localStorage.getItem("year");

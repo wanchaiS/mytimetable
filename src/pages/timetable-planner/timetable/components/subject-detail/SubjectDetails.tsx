@@ -12,11 +12,12 @@ interface SubjectDetailsProps {
   subject: SubjectType;
   subjects: SubjectType[];
   onBack: (subjectCode: string | undefined) => void;
-  onRemoveSubject: (subjectCode: string) => void;
+  onRemoveSubject: (subjectCode: string, semester: string) => void;
   onSelectActivity: (activity: ActivityType) => void;
 }
 
 interface TimeSlot {
+  id: string;
   day: string;
   startTime: string;
   endTime: string;
@@ -34,12 +35,10 @@ export function SubjectDetails({
 }: SubjectDetailsProps) {
   const [drilldownSlot, setDrilldownSlot] = useState<{
     type: string;
-    slot: TimeSlot;
+    subjectActivityGroupId: string;
   } | null>(null);
-
   const handleActivitySelect = (activity: ActivityType) => {
     onSelectActivity(activity);
-    setDrilldownSlot(null);
   };
 
   const groupedActivities = getGroupedActivitiesPerType(subject);
@@ -62,7 +61,9 @@ export function SubjectDetails({
         </div>
         <Trash2
           className="h-4 w-4 cursor-pointer text-red-500"
-          onClick={() => onRemoveSubject(subject.callista_code)}
+          onClick={() =>
+            onRemoveSubject(subject.callista_code, subject.semester)
+          }
         />
       </div>
 
@@ -70,7 +71,9 @@ export function SubjectDetails({
       {Object.keys(groupedActivities).map((type) => {
         const timeSlots = getTimeSlots(groupedActivities[type]);
         const isDrilledDown = drilldownSlot?.type === type;
-
+        const timeSlot = timeSlots.find(
+          (slot) => slot.id === drilldownSlot?.subjectActivityGroupId,
+        );
         return (
           <div key={type}>
             {/* Breadcrumb header */}
@@ -91,8 +94,7 @@ export function SubjectDetails({
                     <ChevronRight className="h-4 w-4" />
                   </span>
                   <span className="font-semibold">
-                    {drilldownSlot.slot.day} {drilldownSlot.slot.startTime} -{" "}
-                    {drilldownSlot.slot.endTime}
+                    {timeSlot?.day} {timeSlot?.startTime} - {timeSlot?.endTime}
                   </span>
                 </>
               )}
@@ -105,10 +107,9 @@ export function SubjectDetails({
             >
               {isDrilledDown
                 ? // Drill-down view: Show all activities for this time slot with SAME badge style
-                  drilldownSlot.slot.activities.map((activity) => {
+                  timeSlot?.activities.map((activity) => {
                     const hasConflict =
                       checkConflict(activity, subjects).length > 0;
-
                     return (
                       <div
                         key={activity.id}
@@ -136,26 +137,31 @@ export function SubjectDetails({
                     const slotId = `${type}-${slot.day}-${slot.startTime}`;
                     const isMulti = slot.activities.length > 1;
                     const singleActivity = !isMulti ? slot.activities[0] : null;
+                    const hasSelected = slot.activities.some((a) => a.selected);
                     const hasConflict = singleActivity
                       ? checkConflict(singleActivity, subjects).length > 0
-                      : false;
+                      : slot.activities.some(
+                          (activity) =>
+                            checkConflict(activity, subjects).length > 0,
+                        );
 
                     return (
                       <div
                         key={slotId}
                         onClick={() => {
                           if (isMulti) {
-                            setDrilldownSlot({ type, slot });
+                            setDrilldownSlot({
+                              type,
+                              subjectActivityGroupId: slot.id,
+                            });
                           } else if (singleActivity) {
                             onSelectActivity(singleActivity);
                           }
                         }}
                         className={cn(
                           "bg-muted/30 flex cursor-pointer items-center justify-between rounded-lg border p-1 hover:brightness-75",
-                          !isMulti &&
-                            singleActivity?.selected &&
-                            "border-active bg-active/10",
-                          !isMulti && hasConflict && "border-red-500",
+                          hasSelected && "border-active bg-active/10",
+                          hasConflict && "border-red-500",
                         )}
                       >
                         <div className="text-muted-foreground text-xs">
@@ -211,10 +217,11 @@ function getTimeSlots(activities: ActivityType[]): TimeSlot[] {
   const slotsMap = new Map<string, TimeSlot>();
 
   activities.forEach((activity) => {
-    const slotKey = `${activity.day}-${activity.startTime}-${activity.endTimeMins}`;
+    const slotKey = activity.subjectActivityTimeSlotId;
 
     if (!slotsMap.has(slotKey)) {
       slotsMap.set(slotKey, {
+        id: slotKey,
         day: activity.day,
         startTime: activity.startTime,
         endTime: minsToTime(activity.endTimeMins),
@@ -226,7 +233,6 @@ function getTimeSlots(activities: ActivityType[]): TimeSlot[] {
 
     slotsMap.get(slotKey)!.activities.push(activity);
   });
-
   return Array.from(slotsMap.values());
 }
 

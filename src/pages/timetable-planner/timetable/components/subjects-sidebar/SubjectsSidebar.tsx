@@ -13,7 +13,7 @@ interface SubjectsSidebarProps {
   setActiveSubjectCode: (subjectCode: string | undefined) => void;
   onSearchSubjects: (open: boolean) => void;
   onSelectActivity: (activity: ActivityType) => void;
-  onRemoveSubject: (subjectCode: string) => void;
+  onRemoveSubject: (subjectCode: string, semester: string) => void;
 }
 
 export default function SubjectsSidebar({

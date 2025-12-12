@@ -30,10 +30,11 @@ export default function Timetable(): React.JSX.Element {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showTimeReserver, setShowTimeReserver] = useState(false);
   const times = getTimes();
-  const { calendarView, semester, year } = useTimetableStore();
+  const { calendarView, year } = useTimetableStore();
   const days = getDays(calendarView);
   const {
     subjects,
+    selectedSemester,
     maxCredit,
     onSelectActivity,
     onAddSubject,
@@ -223,7 +224,7 @@ export default function Timetable(): React.JSX.Element {
           onOpenChange={setShowAddSubject}
           onAddSubject={onAddSubject}
           subjects={subjects}
-          semester={semester}
+          selectedSemester={selectedSemester}
           year={year}
         />
       )}

@@ -1,6 +1,5 @@
 interface SearchSubjectsParams {
   searchTerm: string;
-  semester: string;
   year: number;
 }
 
@@ -41,10 +40,10 @@ export async function searchSubjects({
 }: {
   queryKey: SearchSubjectsQueryKey;
 }): Promise<SubjectsResponse> {
-  const [, { searchTerm, semester, year }] = queryKey;
+  const [, { searchTerm, year }] = queryKey;
 
   const response = await fetch(
-    `${import.meta.env.VITE_SUBJECTS_API}/subjects?searchTerm=${searchTerm}&semester=${mapSemester(semester)}&year=${year}`,
+    `${import.meta.env.VITE_SUBJECTS_API}/subjects?searchTerm=${searchTerm}&year=${year}`,
   );
 
   if (!response.ok) {
@@ -52,8 +51,4 @@ export async function searchSubjects({
   }
 
   return response.json();
-}
-
-function mapSemester(semester: string): "AUT" | "SPR" {
-  return semester === "Autumn" ? "AUT" : "SPR";
 }

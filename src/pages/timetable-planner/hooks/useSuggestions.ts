@@ -36,6 +36,9 @@ export function useSuggestions() {
     (preference: Preference) => {
       const suggestedTimeslots = suggest(subjects, preference);
       if (suggestedTimeslots.length === 0) {
+        console.warn(
+          `[${preference}] No valid timetable found for ${preference} preference`,
+        );
         return;
       }
 
@@ -188,9 +191,22 @@ function calculateScore(
   }
 
   if (preference === "Relaxed") {
-    const activeDaysPoints = activeDays.length * -W_DAYS;
-    const gapPoints = totalGapMinutes * -W_GAP;
-    return activeDaysPoints + gapPoints;
+    const daySpan = calculateDaySpan(activeDays);
+    const minDayGap = calculateMinDayGap(activeDays);
+
+    const activeDaysPoints = activeDays.length * -500; // Reward more days
+    const daySpanPoints = daySpan * -2000; // Reward overall spread Mon-Fri
+    const minDayGapPoints = minDayGap * -50000; // MASSIVELY reward spacing (make this PRIMARY PRIORITY)
+    const gapPoints = totalGapMinutes * -100; // Reward breaks within days
+    const spanPoints = totalSpanMinutes * -50; // Reward longer total span
+
+    return (
+      activeDaysPoints +
+      daySpanPoints +
+      minDayGapPoints +
+      gapPoints +
+      spanPoints
+    );
   }
 
   if (preference === "Late") {
@@ -249,12 +265,47 @@ function calculateLateScore(weekActivities: ActivityType[]): number {
   if (weekActivities.length === 0) {
     return Infinity;
   }
-  let totalStartTime = 0;
-  weekActivities.forEach((activity) => {
-    totalStartTime += activity.startTimeMins;
-  });
-  const averageStartTime = totalStartTime / weekActivities.length;
 
-  // 1440 is minutes in a day
-  return (1440 - averageStartTime) * 100;
+  let totalScore = 0;
+
+  weekActivities.forEach((activity) => {
+    // Base score: later times get lower scores (for minimization)
+    const baseScore = 1440 - activity.startTimeMins;
+
+    // Early morning penalty (before 10 AM = 600 mins)
+    const earlyPenalty = activity.startTimeMins < 600 ? 10000 : 0;
+
+    totalScore += baseScore + earlyPenalty;
+  });
+
+  return totalScore;
+}
+
+function calculateDaySpan(activeDays: string[]): number {
+  if (activeDays.length === 0) return 0;
+
+  const dayIndices = activeDays.map((day) => {
+    const dayMap = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+    return dayMap[day as keyof typeof dayMap] ?? 0;
+  });
+
+  return Math.max(...dayIndices) - Math.min(...dayIndices);
+}
+
+function calculateMinDayGap(activeDays: string[]): number {
+  if (activeDays.length <= 1) return 7; // Max gap if 0 or 1 days
+
+  const dayIndices = activeDays
+    .map((day) => {
+      const dayMap = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+      return dayMap[day as keyof typeof dayMap] ?? 0;
+    })
+    .sort((a, b) => a - b);
+
+  let minGap = 7;
+  for (let i = 0; i < dayIndices.length - 1; i++) {
+    minGap = Math.min(minGap, dayIndices[i + 1] - dayIndices[i]);
+  }
+
+  return minGap;
 }
