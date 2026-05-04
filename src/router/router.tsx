@@ -21,9 +21,6 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  {
-    basename: "/mytimetable",
-  },
 );
 
 export default router;
